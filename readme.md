@@ -1,0 +1,1 @@
+Web app to connect coffee lovers to local coffee roasters built using the [Yelp Fusion](https://www.yelp.com/developers) and [Google Maps](https://developers.google.com/maps/) APIs.
