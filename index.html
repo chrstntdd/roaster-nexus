@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,10 +9,64 @@
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css'>
   <link rel="stylesheet" href="./main.css">
 </head>
+
 <body>
-  <main>
+  <header>
     <h1>ROASTER NEXUS</h1>
+    <form id='location-form'>
+      <input type="text" name="location" placeholder="Enter location">
+    </form>
+    <button>Add a roaster</button>
+  </header>
+  <main>
+    <div class="wrapper">
+      <section id="map">
+        <h1>MAP PLACEHOLDER</h1>
+      </section>
+      <aside id="result-list">
+        <h2 id="location">Virginia Beach, VA</h2>
+        <ol id="result-cards">
+          <li>
+            <article class='result'>
+              <img src="https://static1.squarespace.com/static/538e6d35e4b0f23b0d7954d4/57a4fbf246c3c411bbca4d78/57a51887e58c62866cc1a69d/1470437516763/1.png?format=2500w"
+                alt="">
+              <h3 class="name">Three Ships</h3>
+              <p class="address">607 19th Street Virginia Beach, VA 23451</p>
+              <p class="open-closed">open now</p>
+              <div class="rating">4.7/5</div>
+            </article>
+          </li>
+          <li>
+            <article class='result'>
+              <img src="https://static1.squarespace.com/static/538e6d35e4b0f23b0d7954d4/57a4fbf246c3c411bbca4d78/57a51887e58c62866cc1a69d/1470437516763/1.png?format=2500w"
+                alt="">
+              <h3 class="name">Three Ships</h3>
+              <p class="address">607 19th Street Virginia Beach, VA 23451</p>
+              <p class="open-closed">open now</p>
+              <div class="rating">4.7/5</div>
+            </article>
+          </li>
+          <li>
+            <article class='result'>
+              <img src="https://static1.squarespace.com/static/538e6d35e4b0f23b0d7954d4/57a4fbf246c3c411bbca4d78/57a51887e58c62866cc1a69d/1470437516763/1.png?format=2500w"
+                alt="">
+              <h3 class="name">Three Ships</h3>
+              <p class="address">607 19th Street Virginia Beach, VA 23451</p>
+              <p class="open-closed">open now</p>
+              <div class="rating">4.7/5</div>
+            </article>
+          </li>
+        </ol>
+      </aside>
+    </div>
+    <footer>
+      <p>footer placeholder</p>
+    </footer>
   </main>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+    crossorigin="anonymous"></script>
+  <!--<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJFH1G1JHfT5PTGSeC3ywLQetvikyJZDc&libraries=places"></script>-->
   <script src='./app.js'></script>
 </body>
+
 </html>

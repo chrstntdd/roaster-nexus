@@ -1,3 +1,59 @@
+* {
+  box-sizing: border-box;
+}
+
+header {
+  height: 960px;
+  display: flex;
+  justify-content: center;
+  background-color: tan;
+  align-items: center;
+  flex-direction: column;
+}
+
 h1{
   color: seagreen;
+}
+
+#map{
+  background-color: pink;
+  height: 100%;
+  width: 65%;
+  float: left;
+}
+
+#result-list{
+  width: 35%;
+  float: left;
+  background-color: cadetblue;
+  overflow: scroll;
+  height: 100%;
+}
+
+#result-cards{
+  list-style: none;
+  padding: 5px;
+}
+
+.wrapper{
+  height: 960px;
+}
+
+footer{
+  background-color: red;
+  height: 60px;
+}
+
+footer p{
+  margin: 0;
+}
+
+.result{
+  background-color: orange;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.result img {
+  max-width: 100%;
 }
