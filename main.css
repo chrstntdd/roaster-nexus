@@ -2,6 +2,10 @@
   box-sizing: border-box;
 }
 
+h1{
+  color: seagreen;
+}
+
 header {
   height: 960px;
   display: flex;
@@ -11,8 +15,23 @@ header {
   flex-direction: column;
 }
 
-h1{
-  color: seagreen;
+#location-form {
+  width: 50%;
+}
+
+#location-form input {
+  border: none;
+  padding: 10px;
+  border-radius: 3px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+header button{
+  border: none;
+  padding: 10px;
+  background-color: saddlebrown;
+  border-radius: 3px;
 }
 
 #map{
