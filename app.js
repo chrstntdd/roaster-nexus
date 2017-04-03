@@ -23,23 +23,27 @@ function renderUserLocation (location){
 
 function handleUseCurrentLocation() {
   $('#current-loc-btn').click(function (e) {
-    e.preventDefault();
-    console.log('pressed');
     initMap();
+    $('html, body').animate({
+      scrollTop: $('.wrapper').offset().top
+    }, 2000);
+    
   });
 }
 
+var myMap;
+var infowindow;
 
 function initMap() {
-  var map = new google.maps.Map(document.getElementById('map'), {
+   myMap = new google.maps.Map(document.getElementById('map'), {
     center: {
-      lat: -34.397,
-      lng: 150.644
+      lat: 36.799564, 
+      lng: -76.091784
     },
-    zoom: 6
+    zoom: 12
   });
   var infoWindow = new google.maps.InfoWindow({
-    map: map
+    map: myMap
   });
 
   // Try HTML5 geolocation.
@@ -52,13 +56,23 @@ function initMap() {
 
       infoWindow.setPosition(pos);
       infoWindow.setContent('Location found.');
-      map.setCenter(pos);
+      myMap.setCenter(pos);
+
+      var request = {
+        location: pos,
+        radius: '500',
+        type: ['store']
+      };
+      
+      var service = new google.maps.places.PlacesService(myMap);
+      service.nearbySearch(request, callback);
+
     }, function () {
-      handleLocationError(true, infoWindow, map.getCenter());
+      handleLocationError(true, infoWindow, myMap.getCenter());
     });
   } else {
     // Browser doesn't support Geolocation
-    handleLocationError(false, infoWindow, map.getCenter());
+    handleLocationError(false, infoWindow, myMap.getCenter());
   }
 }
 
@@ -67,4 +81,40 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
   infoWindow.setContent(browserHasGeolocation ?
     'Error: The Geolocation service failed.' :
     'Error: Your browser doesn\'t support geolocation.');
+}
+
+function callback(results, status) {
+  if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+    results.map(result => createMarker(result));
+  } else {
+    //ALERT THE USER THAT NO RESULTS WERE FOUND
+    console.log('Sorry, no results :(')
+  }
+}
+
+function createMarker(place) {
+  getPlaceDetails(place.place_id);
+  var placeLoc = {
+    lat: place.geometry.location.lat(),
+    lng: place.geometry.location.lng()
+  }
+
+  var marker = new google.maps.Marker({
+    position: placeLoc,
+    map: myMap
+  });
+
+  marker.setMap(myMap);
+
+}
+
+function getPlaceDetails(place_id) {
+  var request = {
+    placeId: place_id
+  };
+
+  var service = new google.maps.places.PlacesService(myMap);
+  service.getDetails(request, function (data) {
+    console.log(data);
+  });
 }
