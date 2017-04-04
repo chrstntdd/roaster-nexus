@@ -42,7 +42,7 @@ function initMap() {
     },
     zoom: 12
   });
-  var infoWindow = new google.maps.InfoWindow({
+  infowindow = new google.maps.InfoWindow({
     map: myMap
   });
 
@@ -54,14 +54,14 @@ function initMap() {
         lng: position.coords.longitude
       };
 
-      infoWindow.setPosition(pos);
-      infoWindow.setContent('Location found.');
+      infowindow.setPosition(pos);
+      infowindow.setContent('Location found.');
       myMap.setCenter(pos);
 
       var request = {
         location: pos,
-        radius: '500',
-        type: ['store']
+        radius: '1000',
+        types: ['cafe']
       };
       
       var service = new google.maps.places.PlacesService(myMap);
@@ -106,15 +106,58 @@ function createMarker(place) {
 
   marker.setMap(myMap);
 
+  google.maps.event.addListener(marker, 'click', function () {
+    infowindow.setContent(place.name);
+    infowindow.open(map, this);
+  });
+
 }
 
 function getPlaceDetails(place_id) {
+  // aggregate relevant place details
   var request = {
     placeId: place_id
   };
 
   var service = new google.maps.places.PlacesService(myMap);
   service.getDetails(request, function (data) {
-    console.log(data);
+    var details = {
+      name: data.name || null,
+      addr: data.formatted_address,
+      open: data.opening_hours ? data.opening_hours.open_now : null,
+      phone: data.international_phone_number,
+      website: data.website || null,
+      rating: data.rating,
+      photos: data.photos ? data.photos : null,
+      photoDimension: {'maxWidth' : data.photos[0].width,
+                       'maxHeight': data.photos[0].height
+                      }
+    }
+    renderResultCard(details);
   });
+}
+
+function renderResultCard(details){
+  //render place details into the DOM
+  var resultCardHtml = (
+    '<li>' +
+      '<article class="result">' +
+        '<img src="" alt="">' +
+        '<h3 class="name"></h3>' +
+        '<p class="address"></p>' +
+        '<p class="open-closed"></p>' +
+        '<div class="rating"></div>' +
+      '</article>' +
+    '</li>'
+  );
+  
+  var $res = $(resultCardHtml);
+  
+  $res.find('.name').text(details.name);
+  $res.find('.address').text(details.addr);
+  $res.find('.open-closed').text(details.open);
+  $res.find('.rating').text(details.rating);
+  $res.find('img').attr('src', details.photos[0].getUrl(details.photoDimension))
+
+  $('#result-cards').append($res);
 }
