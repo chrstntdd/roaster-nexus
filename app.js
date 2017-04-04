@@ -3,7 +3,19 @@
 $(function(){
   getUserLocation();
   handleUseCurrentLocation();
+  googleAutoComplete();
 });
+
+function googleAutoComplete (){
+  // allow text input to autocomplete to cities
+  var options = {
+    types: ['(cities)'],
+    componentRestrictions: {country: 'us'}
+  };
+
+  var input = document.getElementById('autocomplete');
+  var autocomplete = new google.maps.places.Autocomplete(input, options);
+}
 
 function getUserLocation (){
   $('#location-form').submit(function(e){
@@ -13,12 +25,9 @@ function getUserLocation (){
     $('html, body').animate({
       scrollTop: $('.wrapper').offset().top
     }, 1000);
-    renderUserLocation(location);
+    renderArea(location);
+    initMap(location);
   });
-}
-
-function renderUserLocation (location){
-  $('#location').text(location);
 }
 
 function handleUseCurrentLocation() {
@@ -64,7 +73,7 @@ function initMap() {
       var request = {
         location: pos,
         radius: '1000',
-        types: ['cafe']
+        keyword: 'coffee'
       };
       
       var service = new google.maps.places.PlacesService(myMap);
@@ -94,9 +103,9 @@ function reverseGeocode(pos){
   })
 }
 
-function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-  infoWindow.setPosition(pos);
-  infoWindow.setContent(browserHasGeolocation ?
+function handleLocationError(browserHasGeolocation, infowindow, pos) {
+  infowindow.setPosition(pos);
+  infowindow.setContent(browserHasGeolocation ?
     'Error: The Geolocation service failed.' :
     'Error: Your browser doesn\'t support geolocation.');
 }
