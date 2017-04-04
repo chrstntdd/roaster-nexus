@@ -27,7 +27,8 @@ function handleUseCurrentLocation() {
     $('html, body').animate({
       scrollTop: $('.wrapper').offset().top
     }, 2000);
-    
+    $('#location').html(''); //clear old location
+    $('#result-cards').html(''); //clear old results
   });
 }
 
@@ -54,6 +55,8 @@ function initMap() {
         lng: position.coords.longitude
       };
 
+      reverseGeocode(pos);
+
       infowindow.setPosition(pos);
       infowindow.setContent('Location found.');
       myMap.setCenter(pos);
@@ -74,6 +77,21 @@ function initMap() {
     // Browser doesn't support Geolocation
     handleLocationError(false, infoWindow, myMap.getCenter());
   }
+}
+
+function reverseGeocode(pos){
+  //convert lat & long from geolocation to a string location
+  var geocoder = new google.maps.Geocoder();
+  var latlng = new google.maps.LatLng(pos.lat,pos.lng);
+
+  geocoder.geocode({'latLng': latlng}, function(results, status){
+    if (status == google.maps.GeocoderStatus.OK){
+      renderArea((results[2].formatted_address));
+    } else {
+      //alert the user that their locaiton cannot be determined.
+      console.error('Can\'t reverse geocode this locaiton');
+    }
+  })
 }
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
@@ -127,7 +145,7 @@ function getPlaceDetails(place_id) {
       open: data.opening_hours ? data.opening_hours.open_now : null,
       phone: data.international_phone_number,
       website: data.website || null,
-      rating: data.rating,
+      rating: data.rating ? data.rating : null,
       photos: data.photos ? data.photos : null,
       photoDimension: {'maxWidth' : data.photos[0].width,
                        'maxHeight': data.photos[0].height
@@ -137,8 +155,13 @@ function getPlaceDetails(place_id) {
   });
 }
 
+function renderArea(area){
+  $('#location').text('Results for ' + area);
+}
+
 function renderResultCard(details){
   //render place details into the DOM
+
   var resultCardHtml = (
     '<li>' +
       '<article class="result">' +
@@ -155,8 +178,8 @@ function renderResultCard(details){
   
   $res.find('.name').text(details.name);
   $res.find('.address').text(details.addr);
-  $res.find('.open-closed').text(details.open);
-  $res.find('.rating').text(details.rating);
+  $res.find('.open-closed').text(details.open ? 'Open now' : 'Closed');
+  $res.find('.rating').text('Rating: ' + details.rating);
   $res.find('img').attr('src', details.photos[0].getUrl(details.photoDimension))
 
   $('#result-cards').append($res);
