@@ -26,13 +26,12 @@ function getUserLocation (){
       scrollTop: $('.wrapper').offset().top
     }, 1000);
     renderArea(location);
-    initMap(location);
   });
 }
 
 function handleUseCurrentLocation() {
   $('#current-loc-btn').click(function (e) {
-    initMap();
+    getUserLatLong();
     $('html, body').animate({
       scrollTop: $('.wrapper').offset().top
     }, 2000);
@@ -44,48 +43,56 @@ function handleUseCurrentLocation() {
 var myMap;
 var infowindow;
 
-function initMap() {
-   myMap = new google.maps.Map(document.getElementById('map'), {
-    center: {
-      lat: 36.799564, 
-      lng: -76.091784
-    },
-    zoom: 12
-  });
-  infowindow = new google.maps.InfoWindow({
-    map: myMap
-  });
-
+function getUserLatLong() {
   // Try HTML5 geolocation.
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function (position) {
       var pos = {
         lat: position.coords.latitude,
         lng: position.coords.longitude
-      };
+      }
 
       reverseGeocode(pos);
+      initMap(pos);
 
       infowindow.setPosition(pos);
-      infowindow.setContent('Location found.');
+      infowindow.setContent('You are here.');
       myMap.setCenter(pos);
 
-      var request = {
-        location: pos,
-        radius: '1000',
-        keyword: 'coffee'
-      };
-      
-      var service = new google.maps.places.PlacesService(myMap);
-      service.nearbySearch(request, callback);
-
     }, function () {
-      handleLocationError(true, infoWindow, myMap.getCenter());
+      handleLocationError(true, infowindow, myMap.getCenter());
     });
   } else {
     // Browser doesn't support Geolocation
-    handleLocationError(false, infoWindow, myMap.getCenter());
-  }
+    handleLocationError(false, infowindow, myMap.getCenter());
+  };
+}
+
+function initMap(pos) {
+   myMap = new google.maps.Map(document.getElementById('map'), {
+    center: {
+      lat: pos.lat,
+      lng: pos.lng
+    },
+    zoom: 12
+  });
+
+  infowindow = new google.maps.InfoWindow({
+    map: myMap
+  });
+  getNearbySearch(pos);
+}
+
+function getNearbySearch(pos) {
+  // call nearbySearch for local coffee shops
+  var request = {
+    location: pos,
+    radius: '1000',
+    keyword: 'coffee'
+  };
+
+  var service = new google.maps.places.PlacesService(myMap);
+  service.nearbySearch(request, callback);
 }
 
 function reverseGeocode(pos){
