@@ -14,7 +14,17 @@ function googleAutoComplete (){
   };
 
   var input = document.getElementById('autocomplete');
-  var autocomplete = new google.maps.places.Autocomplete(input, options);
+  var myAutocomplete = new google.maps.places.Autocomplete(input, options);
+
+  myAutocomplete.addListener('place_changed', function(){
+    // get geolocation of autocompleted city
+    var place = myAutocomplete.getPlace();
+    var pos = {
+      lat: place.geometry.location.lat(),
+      lng: place.geometry.location.lng()
+    }
+    initMap(pos);
+  });
 }
 
 function handleAutocompleteInput (){
@@ -31,7 +41,7 @@ function handleAutocompleteInput (){
 function handleUseCurrentLocation() {
   // get user location from geolocation button
   $('#current-loc-btn').click(function (e) {
-    getUserLatLong();
+    getGeoLatLng();
     scrollToResults();
   });
 }
@@ -47,7 +57,7 @@ function scrollToResults() {
 var myMap;
 var infowindow;
 
-function getUserLatLong() {
+function getGeoLatLng() {
   // Try HTML5 geolocation.
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function (position) {
