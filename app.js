@@ -1,7 +1,7 @@
 'use strict';
 
 $(function(){
-  getUserLocation();
+  handleAutocompleteInput();
   handleUseCurrentLocation();
   googleAutoComplete();
 });
@@ -17,27 +17,31 @@ function googleAutoComplete (){
   var autocomplete = new google.maps.places.Autocomplete(input, options);
 }
 
-function getUserLocation (){
+function handleAutocompleteInput (){
+  // get user location from autocomplete text input
   $('#location-form').submit(function(e){
     e.preventDefault();
     var location = $('#location-form input').val();
     this.reset();
-    $('html, body').animate({
-      scrollTop: $('.wrapper').offset().top
-    }, 1000);
+    scrollToResults();
     renderArea(location);
   });
 }
 
 function handleUseCurrentLocation() {
+  // get user location from geolocation button
   $('#current-loc-btn').click(function (e) {
     getUserLatLong();
-    $('html, body').animate({
-      scrollTop: $('.wrapper').offset().top
-    }, 2000);
-    $('#location').html(''); //clear old location
-    $('#result-cards').html(''); //clear old results
+    scrollToResults();
   });
+}
+
+function scrollToResults() {
+  // scroll to results and remove old data from view
+  $('html, body').animate({
+    scrollTop: $('.wrapper').offset().top
+  }, 2000);
+  $('#location, #result-cards').html('');
 }
 
 var myMap;
@@ -74,7 +78,8 @@ function initMap(pos) {
       lat: pos.lat,
       lng: pos.lng
     },
-    zoom: 12
+    zoom: 12,
+    scrollwheel: false
   });
 
   infowindow = new google.maps.InfoWindow({
