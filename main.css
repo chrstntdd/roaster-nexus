@@ -11,7 +11,7 @@ header {
   width: 100vw;
   display: flex;
   justify-content: center;
-  background-color: tan;
+  background-color: #be9b7b;
   align-items: center;
   flex-direction: column;
 }
@@ -84,6 +84,10 @@ footer p{
 #logo{
   height: 300px;
   margin-bottom: 20px; 
+}
+
+.hidden {
+  display: none;
 }
 
 

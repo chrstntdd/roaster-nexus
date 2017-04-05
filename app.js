@@ -48,6 +48,7 @@ function handleUseCurrentLocation() {
 
 function scrollToResults() {
   // scroll to results and remove old data from view
+  $('.wrapper').removeClass('hidden');
   $('html, body').animate({
     scrollTop: $('.wrapper').offset().top
   }, 2000);
