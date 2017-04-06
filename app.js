@@ -3,6 +3,7 @@
 $(function(){
   handleAutocompleteInput();
   handleUseCurrentLocation();
+  handleCardClick();
   googleAutoComplete();
 });
 
@@ -53,13 +54,16 @@ function scrollToResults() {
     scrollTop: $('.wrapper').offset().top
   }, 2000);
   $('#location, #result-cards').html('');
-  labelIndex = 0;
+  labelCount = 1;
+}
+
+var state = {
+  results: []
 }
 
 var myMap;
 var infowindow;
-var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-var labelIndex = 0;
+var labelCount = 1;
 
 function getGeoLatLng() {
   // Try HTML5 geolocation.
@@ -122,7 +126,7 @@ function reverseGeocode(pos){
 
   geocoder.geocode({'latLng': latlng}, function(results, status){
     if (status == google.maps.GeocoderStatus.OK){
-      renderArea((results[2].formatted_address));
+      renderArea((results[1].formatted_address));
     } else {
       //alert the user that their locaiton cannot be determined.
       console.error('Can\'t reverse geocode this locaiton');
@@ -153,12 +157,13 @@ function createMarker(place) {
   }
   var marker = new google.maps.Marker({
     position: placeLoc,
-    label: labels[labelIndex++ % labels.length],
+    label: labelCount.toString(),
     map: myMap
   });
+  labelCount++;
 
   marker.setMap(myMap);
-  
+
   google.maps.event.addListener(marker, 'click', function () {
     infowindow.setContent(place.name);
     infowindow.open(map, this);
@@ -187,12 +192,14 @@ function getPlaceDetails(place_id, label) {
                       },
       label: label
     }
+    state.results.push(details); //push details of each result to state object for data binding.
+    state.results.sort((a,b) => parseInt(a.label) - parseInt(b.label)); //sort results by lowest label count to highest
     renderResultCard(details);
   });
 }
 
 function renderArea(area){
-  $('#location').text('Results for ' + area);
+  $('#location').text('Coffee roasters in ' + area);
 }
 
 function renderResultCard(details, label){
@@ -202,11 +209,13 @@ function renderResultCard(details, label){
     '<li>' +
       '<article class="result">' +
         '<img src="" alt="">' +
-        '<p class="label"></p>' +
-        '<h3 class="name"></h3>' +
-        '<p class="open-closed"></p>' +
-        '<p class="address"></p>' +
-        '<div class="rating"></div>' +
+        '<div>' +
+          '<p class="label"></p>' +
+          '<h3 class="name"></h3>' +
+          '<p class="open-closed"></p>' +
+          '<p class="address"></p>' +
+          '<p class="rating"></p>' +
+        '</div>' +
       '</article>' +
     '</li>'
   );
@@ -221,4 +230,11 @@ function renderResultCard(details, label){
   $res.find('img').attr('src', details.photos[0].getUrl(details.photoDimension))
 
   $('#result-cards').append($res);
+}
+
+function handleCardClick(){
+  $('#result-list').on('click', '.result', function(e){
+    var thisCardIndex = $(this).find('.label').text();//get the label number of the card clicked on.
+    console.log(state.results);
+  });
 }
