@@ -53,10 +53,13 @@ function scrollToResults() {
     scrollTop: $('.wrapper').offset().top
   }, 2000);
   $('#location, #result-cards').html('');
+  labelIndex = 0;
 }
 
 var myMap;
 var infowindow;
+var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var labelIndex = 0;
 
 function getGeoLatLng() {
   // Try HTML5 geolocation.
@@ -89,7 +92,8 @@ function initMap(pos) {
       lat: pos.lat,
       lng: pos.lng
     },
-    zoom: 12,
+    zoom: 14,
+    streetViewControl: false,
     scrollwheel: false
   });
 
@@ -103,8 +107,8 @@ function getNearbySearch(pos) {
   // call nearbySearch for local coffee shops
   var request = {
     location: pos,
-    radius: '1000',
-    keyword: 'coffee'
+    keyword: 'coffee',
+    rankBy: google.maps.places.RankBy.DISTANCE
   };
 
   var service = new google.maps.places.PlacesService(myMap);
@@ -143,27 +147,26 @@ function callback(results, status) {
 }
 
 function createMarker(place) {
-  getPlaceDetails(place.place_id);
   var placeLoc = {
     lat: place.geometry.location.lat(),
     lng: place.geometry.location.lng()
   }
-
   var marker = new google.maps.Marker({
     position: placeLoc,
+    label: labels[labelIndex++ % labels.length],
     map: myMap
   });
 
   marker.setMap(myMap);
-
+  
   google.maps.event.addListener(marker, 'click', function () {
     infowindow.setContent(place.name);
     infowindow.open(map, this);
   });
-
+  getPlaceDetails(place.place_id, marker.label);
 }
 
-function getPlaceDetails(place_id) {
+function getPlaceDetails(place_id, label) {
   // aggregate relevant place details
   var request = {
     placeId: place_id
@@ -181,7 +184,8 @@ function getPlaceDetails(place_id) {
       photos: data.photos ? data.photos : null,
       photoDimension: {'maxWidth' : data.photos[0].width,
                        'maxHeight': data.photos[0].height
-                      }
+                      },
+      label: label
     }
     renderResultCard(details);
   });
@@ -191,16 +195,17 @@ function renderArea(area){
   $('#location').text('Results for ' + area);
 }
 
-function renderResultCard(details){
+function renderResultCard(details, label){
   //render place details into the DOM
 
   var resultCardHtml = (
     '<li>' +
       '<article class="result">' +
         '<img src="" alt="">' +
+        '<p class="label"></p>' +
         '<h3 class="name"></h3>' +
-        '<p class="address"></p>' +
         '<p class="open-closed"></p>' +
+        '<p class="address"></p>' +
         '<div class="rating"></div>' +
       '</article>' +
     '</li>'
@@ -209,9 +214,10 @@ function renderResultCard(details){
   var $res = $(resultCardHtml);
   
   $res.find('.name').text(details.name);
+  $res.find('.label').text(details.label);
   $res.find('.address').text(details.addr);
   $res.find('.open-closed').text(details.open ? 'Open now' : 'Closed');
-  $res.find('.rating').text('Rating: ' + details.rating);
+  $res.find('.rating').text(details.rating == null ? 'No rating.' : 'Rating: ' + details.rating);
   $res.find('img').attr('src', details.photos[0].getUrl(details.photoDimension))
 
   $('#result-cards').append($res);
