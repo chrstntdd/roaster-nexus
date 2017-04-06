@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Roaster Nexus</title>
+  <link rel='shortcut icon' href='assets/rn-favicon.png'>
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css'>
   <link rel="stylesheet" href="./main.css">
 </head>
@@ -14,15 +15,14 @@
   <header>
     <img id='logo' src="./assets/rn.png" alt="Roaster Nexus Logo">
     <form id='location-form'>
-      <input id='autocomplete' type="text" name="location" placeholder="Enter location">
+      <input id='autocomplete' type="text" name="location" placeholder="Enter city">
     </form>
     <button id='current-loc-btn'>FIND LOCATION</button>
-    <!--<button>Add a roaster</button>-->
   </header>
   <main>
     <div class="wrapper hidden">
       <section id="map">
-        <h1>MAP PLACEHOLDER</h1>
+        <div class="loader"></div>
       </section>
       <aside id="result-list">
         <h2 id="location"></h2>
