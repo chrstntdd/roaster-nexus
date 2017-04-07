@@ -58,7 +58,8 @@ function scrollToResults() {
 }
 
 var state = {
-  results: []
+  results: [],
+  detailedResults: []
 }
 
 var myMap;
@@ -143,93 +144,118 @@ function handleLocationError(browserHasGeolocation, infowindow, pos) {
 
 function callback(results, status) {
   if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
-    results.map(result => createMarker(result));
+    results.map(element => state.results.push(element));
+    createMarker();
   } else {
     //ALERT THE USER THAT NO RESULTS WERE FOUND
     console.log('Sorry, no results :(')
   }
 }
 
-function createMarker(place) {
-  var placeLoc = {
-    lat: place.geometry.location.lat(),
-    lng: place.geometry.location.lng()
-  }
-  var marker = new google.maps.Marker({
-    position: placeLoc,
-    label: labelCount.toString(),
-    map: myMap
-  });
-  labelCount++;
+function createMarker() {
+  state.results.map(function (element) {
+    var placeLoc = {
+      lat: element.geometry.location.lat(),
+      lng: element.geometry.location.lng()
+    }
+    var marker = new google.maps.Marker({
+      position: placeLoc,
+      label: labelCount.toString(),
+      map: myMap
+    });
+    element.label = marker.label;
+    labelCount++;
 
-  marker.setMap(myMap);
+    marker.setMap(myMap);
 
-  google.maps.event.addListener(marker, 'click', function () {
-    infowindow.setContent(place.name);
-    infowindow.open(map, this);
+    google.maps.event.addListener(marker, 'click', function () {
+      infowindow.setContent(element.name);
+      infowindow.open(map, this);
+    });
   });
-  getPlaceDetails(place.place_id, marker.label);
+  getPlaceDetails();
 }
 
-function getPlaceDetails(place_id, label) {
+function getPlaceDetails() {
   // aggregate relevant place details
-  var request = {
-    placeId: place_id
-  };
 
-  var service = new google.maps.places.PlacesService(myMap);
-  service.getDetails(request, function (data) {
-    var details = {
-      name: data.name || null,
-      addr: data.formatted_address,
-      open: data.opening_hours ? data.opening_hours.open_now : null,
-      phone: data.international_phone_number,
-      website: data.website || null,
-      rating: data.rating ? data.rating : null,
-      photos: data.photos ? data.photos : null,
-      photoDimension: {'maxWidth' : data.photos[0].width,
-                       'maxHeight': data.photos[0].height
+ /*BIG thanks to http://bit.ly/2oPkcqa for providing me with the ability 
+ to timeout my requests to service.getDetails so not as to hit the query 
+ limit  */
+  for (var i = 0; i < state.results.length; i++) {
+    setTimeout(function (x) {
+      return function () {
+        var request = {
+          placeId: state.results[x].place_id
+        };
+        var service = new google.maps.places.PlacesService(myMap);
+        service.getDetails(request, detailsCallback);
+        //when loop is finished
+        if (x == state.results.length -1){
+          renderResultCard();
+        }
+      };
+    }(i), 300 * i);
+  }
+
+
+  function detailsCallback(results, status){
+    if (status == google.maps.places.PlacesServiceStatus.OK){
+      var details = {
+      name: results.name || null,
+      addr: results.formatted_address,
+      open: results.opening_hours ? results.opening_hours.open_now : null,
+      phone: results.international_phone_number,
+      website: results.website || null,
+      rating: results.rating ? results.rating : null,
+      photos: results.photos ? results.photos : null,
+      photoDimension: {'maxWidth' : results.photos[0].width,
+                       'maxHeight': results.photos[0].height
                       },
-      label: label
     }
-    state.results.push(details); //push details of each result to state object for data binding.
+    state.detailedResults.push(details); //push details of each result to state object for data binding.
+    } else if (status == google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT){
+      console.error(status);
+    }
+  }
     state.results.sort((a,b) => parseInt(a.label) - parseInt(b.label)); //sort results by lowest label count to highest
-    renderResultCard(details);
-  });
+    // renderResultCard(details);
 }
 
 function renderArea(area){
   $('#location').text('Coffee roasters in ' + area);
 }
 
-function renderResultCard(details, label){
+function renderResultCard() {
   //render place details into the DOM
 
   var resultCardHtml = (
     '<li>' +
-      '<article class="result">' +
-        '<img src="" alt="">' +
-        '<div>' +
-          '<p class="label"></p>' +
-          '<h3 class="name"></h3>' +
-          '<p class="open-closed"></p>' +
-          '<p class="address"></p>' +
-          '<p class="rating"></p>' +
-        '</div>' +
-      '</article>' +
+    '<article class="result">' +
+    '<img src="" alt="">' +
+    '<div>' +
+    '<p class="label"></p>' +
+    '<h3 class="name"></h3>' +
+    '<p class="open-closed"></p>' +
+    '<p class="address"></p>' +
+    '<p class="rating"></p>' +
+    '</div>' +
+    '</article>' +
     '</li>'
   );
-  
-  var $res = $(resultCardHtml);
-  
-  $res.find('.name').text(details.name);
-  $res.find('.label').text(details.label);
-  $res.find('.address').text(details.addr);
-  $res.find('.open-closed').text(details.open ? 'Open now' : 'Closed');
-  $res.find('.rating').text(details.rating == null ? 'No rating.' : 'Rating: ' + details.rating);
-  $res.find('img').attr('src', details.photos[0].getUrl(details.photoDimension))
 
-  $('#result-cards').append($res);
+  state.detailedResults.map(function (element) {
+    var $res = $(resultCardHtml);
+
+    $res.find('.name').text(element.name);
+    // $res.find('.label').text(element.label);
+    $res.find('.address').text(element.addr);
+    $res.find('.open-closed').text(element.open ? 'Open now' : 'Closed');
+    $res.find('.rating').text(element.rating == null ? 'No rating.' : 'Rating: ' + element.rating);
+    $res.find('img').attr('src', element.photos[0].getUrl(element.photoDimension))
+
+    $('#result-cards').append($res);
+  });
 }
 
 function handleCardClick(){
