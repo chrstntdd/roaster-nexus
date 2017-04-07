@@ -112,7 +112,7 @@ function getNearbySearch(pos) {
   // call nearbySearch for local coffee shops
   var request = {
     location: pos,
-    keyword: 'coffee',
+    keyword: 'roaster',
     rankBy: google.maps.places.RankBy.DISTANCE
   };
 
@@ -190,10 +190,6 @@ function getPlaceDetails() {
         };
         var service = new google.maps.places.PlacesService(myMap);
         service.getDetails(request, detailsCallback);
-        //when loop is finished
-        if (x == state.results.length -1){
-          renderResultCard();
-        }
       };
     }(i), 300 * i);
   }
@@ -212,14 +208,20 @@ function getPlaceDetails() {
       photoDimension: {'maxWidth' : results.photos[0].width,
                        'maxHeight': results.photos[0].height
                       },
+      label: state.detailedResults.length + 1
     }
     state.detailedResults.push(details); //push details of each result to state object for data binding.
+
+    //when loop is finished
+    if (state.detailedResults.length == state.results.length){
+      renderResultCard();
+    }
+
     } else if (status == google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT){
       console.error(status);
     }
   }
     state.results.sort((a,b) => parseInt(a.label) - parseInt(b.label)); //sort results by lowest label count to highest
-    // renderResultCard(details);
 }
 
 function renderArea(area){
@@ -248,11 +250,11 @@ function renderResultCard() {
     var $res = $(resultCardHtml);
 
     $res.find('.name').text(element.name);
-    // $res.find('.label').text(element.label);
+    $res.find('.label').text(element.label);
     $res.find('.address').text(element.addr);
     $res.find('.open-closed').text(element.open ? 'Open now' : 'Closed');
     $res.find('.rating').text(element.rating == null ? 'No rating.' : 'Rating: ' + element.rating);
-    $res.find('img').attr('src', element.photos[0].getUrl(element.photoDimension))
+    $res.find('img').attr('src', element.photos[0].getUrl(element.photoDimension));
 
     $('#result-cards').append($res);
   });
@@ -261,6 +263,6 @@ function renderResultCard() {
 function handleCardClick(){
   $('#result-list').on('click', '.result', function(e){
     var thisCardIndex = $(this).find('.label').text();//get the label number of the card clicked on.
-    console.log(state.results);
+    console.log(state);
   });
 }
