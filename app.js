@@ -280,17 +280,27 @@ function handleCardClick(){
   // get result index to reference it's details in renderDetails
   $('#result-list').on('click', '.result', function(e){
     var thisCardIndex = $(this).find('.label').text();//get the label number of the card clicked on.
-    $('#details').removeClass('hidden');
+    $('#details').html(''); //remove old data
     handleGetPhotos(state.detailedResults[thisCardIndex -1]);
     renderDetails(state.detailedResults[thisCardIndex - 1]);
+    $('html, body').animate({
+    scrollTop: $('#details').offset().top
+  }, 2000);
   });
 }
 
 function renderDetails(thisObjDetails){
   // display selected result with more details
-  renderHeader(thisObjDetails);
-  renderContact(thisObjDetails);
-  renderFeedback(thisObjDetails);
+  var header = renderHeader(thisObjDetails);
+  var contact = renderContact(thisObjDetails);
+  var feedback = renderFeedback(thisObjDetails);
+
+
+  $('#details').append(header,contact,feedback);
+  $('#contact, #feedback').wrapAll('<div id="details-wrapper"></div>');
+
+  $('.roaster-banner').css('background-image', 'url("' + thisObjDetails.imgUrls[0] + '")');
+  $('.roaster-banner').addClass('.gradient');
 }
 
 function renderHeader(thisObjDetails) {
@@ -306,11 +316,11 @@ function renderHeader(thisObjDetails) {
 
   var $header = $(headerHtml);
 
-  $header.find('.roaster-banner').attr('style','background-image: url("' + thisObjDetails.imgUrls[0] + '")');
   $header.find('h1').text(thisObjDetails.name);
   $header.find('h3').html('<i class="fa fa-map-marker" aria-hidden="true"></i> ' + thisObjDetails.addr);
 
-  $('.wrapper').after($header);
+  // $('.wrapper').after($header);
+  return $header
 }
 
 function renderContact(thisObjDetails){
@@ -318,14 +328,14 @@ function renderContact(thisObjDetails){
   var hours = thisObjDetails.hours.map(dayHours => '<li>' + dayHours + '</li>');
 
   var contactHtml = (
-  '<section id="contact">' +
-    '<h3>HOURS</h3>' +
-    '<ol id="hours"></ol>' +
-    '<h3>PHONE</h3>' +
-    '<p id="phone"></p>' +
-    '<h3>WEBSITE</h3>' +
-    '<a id="website" target="_blank"></a>' +
-  '</section>'
+      '<section id="contact">' +
+        '<h3>HOURS</h3>' +
+        '<ol id="hours"></ol>' +
+        '<h3>PHONE</h3>' +
+        '<p id="phone"></p>' +
+        '<h3>WEBSITE</h3>' +
+        '<a id="website" target="_blank"></a>' +
+      '</section>'
   );
 
   var $contact = $(contactHtml);
@@ -334,16 +344,17 @@ function renderContact(thisObjDetails){
   $contact.find('#phone').text(thisObjDetails.phone);
   $contact.find('#website').attr('href', thisObjDetails.website).text(thisObjDetails.website);
 
-  $('.roaster-banner').after($contact);
+  // $('.roaster-banner').after($contact);
+  return $contact;
 }
 
 function renderFeedback(thisObjDetails){
   var feedbackHtml = (
-  '<section id="feedback">' + 
-    '<h3 id="rating"></h3>' + 
-    '<h2>REVIEWS</h2>' + 
-    '<ul></ul>' +
-  '</section>'
+    '<section id="feedback">' + 
+      '<h3 id="rating"></h3>' + 
+      '<h2>REVIEWS</h2>' + 
+      '<ul></ul>' +
+    '</section>'
   );
 
   var $feedback = $(feedbackHtml);
@@ -351,7 +362,8 @@ function renderFeedback(thisObjDetails){
   $feedback.find('#rating').text('AVERAGE RATING ' + thisObjDetails.rating + '/5');
   $feedback.find('ul').html(renderReviews(thisObjDetails));
 
-  $('#contact').after($feedback);
+  // $('#contact').after($feedback);
+  return $feedback;
 }
 
 function renderReviews(thisObjDetails){
