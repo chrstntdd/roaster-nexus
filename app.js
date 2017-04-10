@@ -276,41 +276,40 @@ function renderResultCard() {
   });
 }
 
-function handleCardClick(){
+function handleCardClick() {
   // get result index to reference it's details in renderDetails
-  $('#result-list').on('click', '.result', function(e){
-    var thisCardIndex = $(this).find('.label').text();//get the label number of the card clicked on.
+  $('#result-list').on('click', '.result', function (e) {
+    var thisCardIndex = $(this).find('.label').text(); //get the label number of the card clicked on.
     $('#details').html(''); //remove old data
-    handleGetPhotos(state.detailedResults[thisCardIndex -1]);
+    handleGetPhotos(state.detailedResults[thisCardIndex - 1]);
     renderDetails(state.detailedResults[thisCardIndex - 1]);
     $('html, body').animate({
-    scrollTop: $('#details').offset().top
-  }, 2000);
+      scrollTop: $('#details').offset().top
+    }, 2000);
   });
 }
 
-function renderDetails(thisObjDetails){
-  // display selected result with more details
+function renderDetails(thisObjDetails) {
+  // appends object details bound to html templates to DOM and adds header background image
   var header = renderHeader(thisObjDetails);
   var contact = renderContact(thisObjDetails);
   var feedback = renderFeedback(thisObjDetails);
 
-
-  $('#details').append(header,contact,feedback);
+  $('#details').append(header, contact, feedback);
   $('#contact, #feedback').wrapAll('<div id="details-wrapper"></div>');
 
   $('.roaster-banner').css('background-image', 'url("' + thisObjDetails.imgUrls[0] + '")');
-  $('.roaster-banner').addClass('.gradient');
 }
 
 function renderHeader(thisObjDetails) {
+  // bind object details to header
 
   var headerHtml = (
     '<header class="roaster-banner">' +
-      '<div class="banner-title">' +
-        '<h1></h1>' +
-        '<h3 id="address"></h3>' +
-      '</div>' +
+    '<div class="banner-title">' +
+    '<h1></h1>' +
+    '<h3 id="address"></h3>' +
+    '</div>' +
     '</header>'
   );
 
@@ -319,23 +318,23 @@ function renderHeader(thisObjDetails) {
   $header.find('h1').text(thisObjDetails.name);
   $header.find('h3').html('<i class="fa fa-map-marker" aria-hidden="true"></i> ' + thisObjDetails.addr);
 
-  // $('.wrapper').after($header);
   return $header
 }
 
-function renderContact(thisObjDetails){
+function renderContact(thisObjDetails) {
+  // bind object details to contact section
 
   var hours = thisObjDetails.hours.map(dayHours => '<li>' + dayHours + '</li>');
 
   var contactHtml = (
-      '<section id="contact">' +
-        '<h3>HOURS</h3>' +
-        '<ol id="hours"></ol>' +
-        '<h3>PHONE</h3>' +
-        '<p id="phone"></p>' +
-        '<h3>WEBSITE</h3>' +
-        '<a id="website" target="_blank"></a>' +
-      '</section>'
+    '<section id="contact">' +
+    '<h3>HOURS</h3>' +
+    '<ol id="hours"></ol>' +
+    '<h3>PHONE</h3>' +
+    '<p id="phone"></p>' +
+    '<h3>WEBSITE</h3>' +
+    '<a id="website" target="_blank"></a>' +
+    '</section>'
   );
 
   var $contact = $(contactHtml);
@@ -344,16 +343,16 @@ function renderContact(thisObjDetails){
   $contact.find('#phone').text(thisObjDetails.phone);
   $contact.find('#website').attr('href', thisObjDetails.website).text(thisObjDetails.website);
 
-  // $('.roaster-banner').after($contact);
   return $contact;
 }
 
-function renderFeedback(thisObjDetails){
+function renderFeedback(thisObjDetails) {
+  // bind object details to feedback section
   var feedbackHtml = (
-    '<section id="feedback">' + 
-      '<h3 id="rating"></h3>' + 
-      '<h2>REVIEWS</h2>' + 
-      '<ul></ul>' +
+    '<section id="feedback">' +
+    '<h3 id="rating"></h3>' +
+    '<h2>REVIEWS</h2>' +
+    '<ul></ul>' +
     '</section>'
   );
 
@@ -362,30 +361,29 @@ function renderFeedback(thisObjDetails){
   $feedback.find('#rating').text('AVERAGE RATING ' + thisObjDetails.rating + '/5');
   $feedback.find('ul').html(renderReviews(thisObjDetails));
 
-  // $('#contact').after($feedback);
   return $feedback;
 }
 
-function renderReviews(thisObjDetails){
-  //return review html to renderfeedback;
+function renderReviews(thisObjDetails) {
+  // return review html back to renderFeedback() as an array
   var reviewList = [];
 
-  thisObjDetails.reviews.map(function(review){
+  thisObjDetails.reviews.map(function (review) {
     var reviewHtml = (
-    '<li>' +
+      '<li>' +
       '<article class="review">' +
-        '<img src="" alt="">' +
-        '<h4></h4>' +
-        '<p id="rating"></p>' +
-        '<p id="desc"></p>' +
+      '<img src="" alt="">' +
+      '<h4></h4>' +
+      '<p id="rating"></p>' +
+      '<p id="desc"></p>' +
       '</article>' +
-    '</li>'
+      '</li>'
     );
 
     var $review = $(reviewHtml);
 
     $review.find('img').attr('src', review.profile_photo_url);
-    $review.find('h4').html('<a href="' + review.author_url + '">'+ review.author_name +'</a>');
+    $review.find('h4').html('<a href="' + review.author_url + '">' + review.author_name + '</a>');
     $review.find('#desc').text(review.text);
     $review.find('#rating').text(review.rating + '/5');
     reviewList.push($review);
