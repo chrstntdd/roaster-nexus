@@ -54,6 +54,10 @@ function scrollToResults() {
     scrollTop: $('.wrapper').offset().top
   }, 2000);
   $('#location, #result-cards').html('');
+  state = {
+    results: [],
+    detailedResults: []
+  }
   labelCount = 1;
 }
 
@@ -145,6 +149,7 @@ function handleLocationError(browserHasGeolocation, infowindow, pos) {
 function callback(results, status) {
   if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
     results.map(element => state.results.push(element));
+    state.results.sort((a,b) => parseInt(a.label) - parseInt(b.label)); //sort results by lowest label count to highest
     createMarker();
   } else {
     //ALERT THE USER THAT NO RESULTS WERE FOUND
@@ -196,6 +201,7 @@ function getPlaceDetails() {
 
 
   function detailsCallback(results, status){
+    //aggregate relevant details from .getDetails and store in global state.
     if (status == google.maps.places.PlacesServiceStatus.OK){
       var details = {
       name: results.name || null,
@@ -208,9 +214,12 @@ function getPlaceDetails() {
       photoDimension: {'maxWidth' : results.photos[0].width,
                        'maxHeight': results.photos[0].height
                       },
-      label: state.detailedResults.length + 1
+      label: state.detailedResults.length + 1,
+      hours: results.opening_hours ? results.opening_hours.weekday_text : null,
+      reviews: results.reviews ? results.reviews : null,
+      imgUrls: []
     }
-    state.detailedResults.push(details); //push details of each result to state object for data binding.
+    state.detailedResults.push(details);
 
     //when loop is finished
     if (state.detailedResults.length == state.results.length){
@@ -221,7 +230,14 @@ function getPlaceDetails() {
       console.error(status);
     }
   }
-    state.results.sort((a,b) => parseInt(a.label) - parseInt(b.label)); //sort results by lowest label count to highest
+}
+
+function handleGetPhotos(placeObj){
+  // get photo urls from places api using getUrl and add to object
+  placeObj.photos.map(function(photo){
+    var imgUrl = photo.getUrl({'maxWidth': photo.width, 'maxHeight' : photo.height});
+    placeObj.imgUrls.push(imgUrl);
+  });
 }
 
 function renderArea(area){
@@ -261,8 +277,106 @@ function renderResultCard() {
 }
 
 function handleCardClick(){
+  // get result index to reference it's details in renderDetails
   $('#result-list').on('click', '.result', function(e){
     var thisCardIndex = $(this).find('.label').text();//get the label number of the card clicked on.
-    console.log(state);
+    $('#details').removeClass('hidden');
+    handleGetPhotos(state.detailedResults[thisCardIndex -1]);
+    renderDetails(state.detailedResults[thisCardIndex - 1]);
   });
+}
+
+function renderDetails(thisObjDetails){
+  // display selected result with more details
+  renderHeader(thisObjDetails);
+  renderContact(thisObjDetails);
+  renderFeedback(thisObjDetails);
+}
+
+function renderHeader(thisObjDetails) {
+
+  var headerHtml = (
+    '<header class="roaster-banner">' +
+      '<div class="banner-title">' +
+        '<h1></h1>' +
+        '<h3 id="address"></h3>' +
+      '</div>' +
+    '</header>'
+  );
+
+  var $header = $(headerHtml);
+
+  $header.find('.roaster-banner').attr('style','background-image: url("' + thisObjDetails.imgUrls[0] + '")');
+  $header.find('h1').text(thisObjDetails.name);
+  $header.find('h3').html('<i class="fa fa-map-marker" aria-hidden="true"></i> ' + thisObjDetails.addr);
+
+  $('.wrapper').after($header);
+}
+
+function renderContact(thisObjDetails){
+
+  var hours = thisObjDetails.hours.map(dayHours => '<li>' + dayHours + '</li>');
+
+  var contactHtml = (
+  '<section id="contact">' +
+    '<h3>HOURS</h3>' +
+    '<ol id="hours"></ol>' +
+    '<h3>PHONE</h3>' +
+    '<p id="phone"></p>' +
+    '<h3>WEBSITE</h3>' +
+    '<a id="website" target="_blank"></a>' +
+  '</section>'
+  );
+
+  var $contact = $(contactHtml);
+
+  $contact.find('#hours').html(hours);
+  $contact.find('#phone').text(thisObjDetails.phone);
+  $contact.find('#website').attr('href', thisObjDetails.website).text(thisObjDetails.website);
+
+  $('.roaster-banner').after($contact);
+}
+
+function renderFeedback(thisObjDetails){
+  var feedbackHtml = (
+  '<section id="feedback">' + 
+    '<h3 id="rating"></h3>' + 
+    '<h2>REVIEWS</h2>' + 
+    '<ul></ul>' +
+  '</section>'
+  );
+
+  var $feedback = $(feedbackHtml);
+
+  $feedback.find('#rating').text('AVERAGE RATING ' + thisObjDetails.rating + '/5');
+  $feedback.find('ul').html(renderReviews(thisObjDetails));
+
+  $('#contact').after($feedback);
+}
+
+function renderReviews(thisObjDetails){
+  //return review html to renderfeedback;
+  var reviewList = [];
+
+  thisObjDetails.reviews.map(function(review){
+    var reviewHtml = (
+    '<li>' +
+      '<article class="review">' +
+        '<img src="" alt="">' +
+        '<h4></h4>' +
+        '<p id="rating"></p>' +
+        '<p id="desc"></p>' +
+      '</article>' +
+    '</li>'
+    );
+
+    var $review = $(reviewHtml);
+
+    $review.find('img').attr('src', review.profile_photo_url);
+    $review.find('h4').html('<a href="' + review.author_url + '">'+ review.author_name +'</a>');
+    $review.find('#desc').text(review.text);
+    $review.find('#rating').text(review.rating + '/5');
+    reviewList.push($review);
+  });
+  return reviewList;
 }
