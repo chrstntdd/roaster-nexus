@@ -34,9 +34,14 @@ function handleAutocompleteInput (){
     e.preventDefault();
     var location = $('#location-form input').val();
     this.reset();
+    resetDetails();
     scrollToResults();
     renderArea(location);
   });
+}
+
+function resetDetails(){
+  $('#details').html(''); 
 }
 
 function handleUseCurrentLocation() {
@@ -211,8 +216,8 @@ function getPlaceDetails() {
       website: results.website || null,
       rating: results.rating ? results.rating : null,
       photos: results.photos ? results.photos : null,
-      photoDimension: {'maxWidth' : results.photos[0].width,
-                       'maxHeight': results.photos[0].height
+      photoDimension: {'maxWidth' : (results.photos && results.photos[0].width) ? results.photos[0].width : null,
+                       'maxHeight': (results.photos && results.photos[0].height) ? results.photos[0].height: null
                       },
       label: state.detailedResults.length + 1,
       hours: results.opening_hours ? results.opening_hours.weekday_text : null,
@@ -270,7 +275,9 @@ function renderResultCard() {
     $res.find('.address').text(element.addr);
     $res.find('.open-closed').text(element.open ? 'Open now' : 'Closed');
     $res.find('.rating').text(element.rating == null ? 'No rating.' : 'Rating: ' + element.rating);
-    $res.find('img').attr('src', element.photos[0].getUrl(element.photoDimension));
+    $res.find('img').attr('src', element.photos ? 
+                                 element.photos[0].getUrl(element.photoDimension) : 
+                                 'https://images.unsplash.com/photo-1442411210769-b95c4632195e?dpr=2&auto=format&fit=crop&w=1199&h=799&q=80&cs=tinysrgb&crop=&bg=');
 
     $('#result-cards').append($res);
   });
@@ -280,7 +287,7 @@ function handleCardClick() {
   // get result index to reference it's details in renderDetails
   $('#result-list').on('click', '.result', function (e) {
     var thisCardIndex = $(this).find('.label').text(); //get the label number of the card clicked on.
-    $('#details').html(''); //remove old data
+    resetDetails();
     handleGetPhotos(state.detailedResults[thisCardIndex - 1]);
     renderDetails(state.detailedResults[thisCardIndex - 1]);
     $('html, body').animate({
@@ -298,7 +305,10 @@ function renderDetails(thisObjDetails) {
   $('#details').append(header, contact, feedback);
   $('#contact, #feedback').wrapAll('<div id="details-wrapper"></div>');
 
-  $('.roaster-banner').css('background-image', 'url("' + thisObjDetails.imgUrls[0] + '")');
+  $('.roaster-banner').css({
+    'background-image' : 'linear-gradient(to bottom,rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.6)), url("' + thisObjDetails.imgUrls[0] + '")'
+  });
+
 }
 
 function renderHeader(thisObjDetails) {
@@ -324,7 +334,7 @@ function renderHeader(thisObjDetails) {
 function renderContact(thisObjDetails) {
   // bind object details to contact section
 
-  var hours = thisObjDetails.hours.map(dayHours => '<li>' + dayHours + '</li>');
+  var hours = thisObjDetails.hours ? thisObjDetails.hours.map(dayHours => '<li>' + dayHours + '</li>') : null;
 
   var contactHtml = (
     '<section id="contact">' +
@@ -339,7 +349,7 @@ function renderContact(thisObjDetails) {
 
   var $contact = $(contactHtml);
 
-  $contact.find('#hours').html(hours);
+  $contact.find('#hours').html(hours ? hours : 'No hours available.');
   $contact.find('#phone').text(thisObjDetails.phone);
   $contact.find('#website').attr('href', thisObjDetails.website).text(thisObjDetails.website);
 
@@ -358,7 +368,9 @@ function renderFeedback(thisObjDetails) {
 
   var $feedback = $(feedbackHtml);
 
-  $feedback.find('#rating').text('AVERAGE RATING ' + thisObjDetails.rating + '/5');
+  $feedback.find('#rating').text(thisObjDetails.rating != null ? 
+                                'AVERAGE RATING ' + thisObjDetails.rating + '/5' : 
+                                'No rating for this roaster.')
   $feedback.find('ul').html(renderReviews(thisObjDetails));
 
   return $feedback;
@@ -385,7 +397,7 @@ function renderReviews(thisObjDetails) {
     $review.find('img').attr('src', review.profile_photo_url);
     $review.find('h4').html('<a href="' + review.author_url + '">' + review.author_name + '</a>');
     $review.find('#desc').text(review.text);
-    $review.find('#rating').text(review.rating + '/5');
+    $review.find('#rating').text( review.rating + '/5');
     reviewList.push($review);
   });
   return reviewList;
