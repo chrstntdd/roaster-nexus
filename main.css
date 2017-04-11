@@ -179,16 +179,12 @@
   font-weight: 200;
 }
 
-
-
 #details a {
   text-decoration: none;
   color: #b59071;
 }
 
-
-
-#reviews ul {
+#feedback ul {
   list-style: none;
   padding: 0;
 }
@@ -208,12 +204,10 @@
   overflow: hidden;
 }
 
-#reviews li {
+#feedback li {
   height: 100%;
   line-height: 100%;
 }
-
-
 
 @keyframes spin {
     0% { transform: rotate(0deg); }
@@ -233,6 +227,11 @@
 
   #contact {
     width: 100vw;
+    padding-left: 5%;
+  }
+
+  #feedback h3,
+  #feedback h2 {
     padding-left: 5%;
   }
 }
