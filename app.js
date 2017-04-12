@@ -5,6 +5,8 @@ $(function(){
   handleUseCurrentLocation();
   handleCardClick();
   googleAutoComplete();
+  handleReturnToResults();
+  testScreenSize();
 });
 
 function googleAutoComplete (){
@@ -313,6 +315,7 @@ function renderDetails(thisObjDetails) {
     'background-image' : 'linear-gradient(to bottom,rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.6)), url("' + thisObjDetails.imgUrls[0] + '")'
   });
 
+  $('footer').removeClass('hidden');
 }
 
 function renderHeader(thisObjDetails) {
@@ -405,4 +408,19 @@ function renderReviews(thisObjDetails) {
     reviewList.push($review);
   });
   return reviewList;
+}
+
+function handleReturnToResults(){
+  $('#return-to-results').click(function(e){
+    $('html, body').animate({
+      scrollTop: $('.wrapper').offset().top
+    }, 2000);
+  });
+}
+
+function testScreenSize(){
+  // if mobile, hide map.
+  if ($('#result-list').css('width') == '100%'){
+    $('#map').hide();
+  }
 }
