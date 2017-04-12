@@ -106,7 +106,7 @@ function initMap(pos) {
       lat: pos.lat,
       lng: pos.lng
     },
-    zoom: 14,
+    zoom: 13,
     streetViewControl: false,
     scrollwheel: false
   });
@@ -157,9 +157,13 @@ function callback(results, status) {
     state.results.sort((a,b) => parseInt(a.label) - parseInt(b.label)); //sort results by lowest label count to highest
     createMarker();
   } else {
-    //ALERT THE USER THAT NO RESULTS WERE FOUND
-    console.log('Sorry, no results :(')
+    renderNoResults();
   }
+}
+
+function renderNoResults(){
+  //ALERT THE USER THAT NO RESULTS WERE FOUND
+  $('#location').text('No roasters found in this location.');
 }
 
 function createMarker() {
