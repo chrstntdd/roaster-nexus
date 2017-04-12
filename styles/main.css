@@ -6,7 +6,7 @@
   width: 100vw;
   display: flex;
   justify-content: center;
-  background-color: #be9b7b;
+  background-color: #b59071;
   align-items: center;
   flex-direction: column; }
   #main-header #location-form {
@@ -20,7 +20,7 @@
       text-align: center;
       background-color: #fff3e7; }
   #main-header #logo {
-    height: 300px;
+    height: 25%;
     margin-bottom: 20px; }
   #main-header button {
     border: none;
@@ -87,13 +87,6 @@
   #details header h3 {
     margin-left: 20px; }
   #details .roaster-banner {
-    /*gradient to make text more readable against the header image. */
-  /*background:
-linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 0.6)
-  );*/
     width: 100%;
     min-height: 400px;
     background-repeat: no-repeat;
