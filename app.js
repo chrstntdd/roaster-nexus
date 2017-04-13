@@ -64,7 +64,11 @@ function scrollToResults() {
   state = {
     results: [],
     detailedResults: []
-  }
+  };
+  pdxState = {
+    nextUrl : '',
+    roasters: []
+  };
   labelCount = 1;
 }
 
@@ -142,7 +146,7 @@ function reverseGeocode(pos){
   geocoder.geocode({'latLng': latlng}, function(results, status){
     if (status == google.maps.GeocoderStatus.OK){
       var area = results[1].formatted_address
-      area.includes('Portland') ? 
+      area.includes('Portland, OR') ? 
         callPDXRoasters('http://www.pdxroasters.com/api/roaster/?format=jsonp', pos) :
         getNearbySearch(pos);
       renderArea(area);
@@ -205,7 +209,8 @@ function createMarker(roasterList) {
       infowindow.open(map, this);
     });
   });
-  roasterList.roasts ? renderResultCard() : getPlaceDetails();
+  // check if data is from google or PDXroasters
+  roasterList[0].modified_at ? renderResultCard(pdxState.roasters) : getPlaceDetails();
 }
 
 function getPlaceDetails() {
@@ -250,7 +255,7 @@ function getPlaceDetails() {
 
     //when loop is finished
     if (state.detailedResults.length == state.results.length){
-      renderResultCard();
+      renderResultCard(state.detailedResults);
     }
 
     } else if (status == google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT){
@@ -271,7 +276,7 @@ function renderArea(area){
   $('#location').text('Coffee roasters in ' + area);
 }
 
-function renderResultCard() {
+function renderResultCard(roasterList) {  
   //render place details into the DOM
 
   var resultCardHtml = (
@@ -289,7 +294,7 @@ function renderResultCard() {
     '</li>'
   );
 
-  state.detailedResults.map(function (element) {
+  roasterList.map(function (element) {
     var $res = $(resultCardHtml);
 
     $res.find('.name').text(element.name);
