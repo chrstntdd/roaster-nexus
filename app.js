@@ -73,6 +73,11 @@ var state = {
   detailedResults: []
 }
 
+var pdxState = {
+  nextUrl : '',
+  roasters: []
+};
+
 var myMap;
 var infowindow;
 var labelCount = 1;
@@ -137,7 +142,9 @@ function reverseGeocode(pos){
   geocoder.geocode({'latLng': latlng}, function(results, status){
     if (status == google.maps.GeocoderStatus.OK){
       var area = results[1].formatted_address
-      area.includes('Portland') ? callPDXRoasters() : getNearbySearch(pos);
+      area.includes('Portland') ? 
+        callPDXRoasters('http://www.pdxroasters.com/api/roaster/?format=jsonp', pos) :
+        getNearbySearch(pos);
       renderArea(area);
     } else {
       //alert the user that their locaiton cannot be determined.
@@ -157,7 +164,7 @@ function callback(results, status) {
   if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
     results.map(element => state.results.push(element));
     state.results.sort((a,b) => parseInt(a.label) - parseInt(b.label)); //sort results by lowest label count to highest
-    createMarker();
+    createMarker(state.results);
   } else {
     renderNoResults();
   }
@@ -168,11 +175,20 @@ function renderNoResults(){
   $('#location').text('No roasters found in this location.');
 }
 
-function createMarker() {
-  state.results.map(function (element) {
-    var placeLoc = {
-      lat: element.geometry.location.lat(),
-      lng: element.geometry.location.lng()
+function createMarker(roasterList) {
+  /* Expects roasterList to come in as an array 
+  sorted from closest location to furthest away */
+  roasterList.map(function (element) {
+    if(element.geometry){
+      var placeLoc = {
+        lat: element.geometry.location.lat(),
+        lng: element.geometry.location.lng()
+      }
+    } else {
+      var placeLoc = {
+        lat: Number(element.lat),
+        lng: Number(element.lng)
+      }
     }
     var marker = new google.maps.Marker({
       position: placeLoc,
@@ -189,7 +205,7 @@ function createMarker() {
       infowindow.open(map, this);
     });
   });
-  getPlaceDetails();
+  roasterList.roasts ? renderResultCard() : getPlaceDetails();
 }
 
 function getPlaceDetails() {
@@ -216,7 +232,7 @@ function getPlaceDetails() {
     if (status == google.maps.places.PlacesServiceStatus.OK){
       var details = {
       name: results.name || null,
-      addr: results.formatted_address,
+      address: results.formatted_address,
       open: results.opening_hours ? results.opening_hours.open_now : null,
       phone: results.international_phone_number,
       website: results.website || null,
@@ -278,7 +294,7 @@ function renderResultCard() {
 
     $res.find('.name').text(element.name);
     $res.find('.label').text(element.label);
-    $res.find('.address').text(element.addr);
+    $res.find('.address').text(element.address);
     $res.find('.open-closed').text(element.open ? 'Open now' : 'Closed');
     $res.find('.rating').text(element.rating == null ? 'No rating.' : 'Rating: ' + element.rating + '/5');
     $res.find('img').attr('src', element.photos ? 
@@ -333,7 +349,7 @@ function renderHeader(thisObjDetails) {
   var $header = $(headerHtml);
 
   $header.find('h1').text(thisObjDetails.name);
-  $header.find('h3').html('<i class="fa fa-map-marker" aria-hidden="true"></i> ' + thisObjDetails.addr);
+  $header.find('h3').html('<i class="fa fa-map-marker" aria-hidden="true"></i> ' + thisObjDetails.address);
 
   return $header
 }
@@ -425,14 +441,33 @@ function testScreenSize(){
   }
 }
 
-function callPDXRoasters (){
+function callPDXRoasters (url, pos){
   $.ajax({
-    url: 'http://www.pdxroasters.com/api/roaster/?format=jsonp',
+    url: url,
     dataType: 'jsonp',
     crossOrigin: true,
     method: 'GET',
     success: function(data){
-      console.log(data);
+      handlePDXData(data, pos);
     }
   });
+}
+
+function handlePDXData(data, pos){
+  // push data from API call to global state
+  pdxState.nextUrl = data.meta.next;
+  data.objects.map(roaster => pdxState.roasters.push(roaster));
+
+  calcDistBetweenUserAndRoaster(pos);
+}
+
+function calcDistBetweenUserAndRoaster(pos) {
+  var latlng1 = new google.maps.LatLng(pos.lat,pos.lng); //user position
+  pdxState.roasters.forEach(function(roaster){
+    var latlng2 = new google.maps.LatLng(Number(roaster.lat),Number(roaster.lng));
+    roaster.distance = google.maps.geometry.spherical.computeDistanceBetween(latlng1, latlng2);
+  });
+  // arrange roasters in order from closest to furthest away
+  pdxState.roasters.sort((a,b) => parseInt(a.distance) - parseInt(b.distance));
+  createMarker(pdxState.roasters);
 }
