@@ -85,8 +85,6 @@ function getGeoLatLng() {
         lat: position.coords.latitude,
         lng: position.coords.longitude
       }
-
-      reverseGeocode(pos);
       initMap(pos);
 
       infowindow.setPosition(pos);
@@ -103,7 +101,7 @@ function getGeoLatLng() {
 }
 
 function initMap(pos) {
-   myMap = new google.maps.Map(document.getElementById('map'), {
+  myMap = new google.maps.Map(document.getElementById('map'), {
     center: {
       lat: pos.lat,
       lng: pos.lng
@@ -116,7 +114,7 @@ function initMap(pos) {
   infowindow = new google.maps.InfoWindow({
     map: myMap
   });
-  getNearbySearch(pos);
+  reverseGeocode(pos)
 }
 
 function getNearbySearch(pos) {
@@ -138,12 +136,14 @@ function reverseGeocode(pos){
 
   geocoder.geocode({'latLng': latlng}, function(results, status){
     if (status == google.maps.GeocoderStatus.OK){
-      renderArea((results[1].formatted_address));
+      var area = results[1].formatted_address
+      area.includes('Portland') ? callPDXRoasters() : getNearbySearch(pos);
+      renderArea(area);
     } else {
       //alert the user that their locaiton cannot be determined.
       console.error('Can\'t reverse geocode this locaiton');
     }
-  })
+  });
 }
 
 function handleLocationError(browserHasGeolocation, infowindow, pos) {
@@ -280,7 +280,7 @@ function renderResultCard() {
     $res.find('.label').text(element.label);
     $res.find('.address').text(element.addr);
     $res.find('.open-closed').text(element.open ? 'Open now' : 'Closed');
-    $res.find('.rating').text(element.rating == null ? 'No rating.' : 'Rating: ' + element.rating);
+    $res.find('.rating').text(element.rating == null ? 'No rating.' : 'Rating: ' + element.rating + '/5');
     $res.find('img').attr('src', element.photos ? 
                                  element.photos[0].getUrl(element.photoDimension) : 
                                  'https://images.unsplash.com/photo-1442411210769-b95c4632195e?dpr=2&auto=format&fit=crop&w=1199&h=799&q=80&cs=tinysrgb&crop=&bg=');
@@ -423,4 +423,16 @@ function testScreenSize(){
   if ($('#result-list').css('width') == '100%'){
     $('#map').hide();
   }
+}
+
+function callPDXRoasters (){
+  $.ajax({
+    url: 'http://www.pdxroasters.com/api/roaster/?format=jsonp',
+    dataType: 'jsonp',
+    crossOrigin: true,
+    method: 'GET',
+    success: function(data){
+      console.log(data);
+    }
+  });
 }
