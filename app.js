@@ -298,29 +298,40 @@ function renderResultCard() {
     $('#result-cards').append($res);
   });
 
-  var $fallback = $(resultCardHtml);
+  var fallbackCardHtml = (
+    '<li>' +
+    '<article class="result fallback">' +
+    '<h3>Can\'t find what you\'re looking for?</h3>' +
+    '<button id="btn-fallback">TRY ANOTHER SEARCH</button>' +
+    '</article>' +
+    '</li>'
+  )
 
-  $fallback.find('.name').text('Can\'t find what you\'re looking for?');
-  $fallback.find('.open-closed').text('Click here to try another search.');
-  $fallback.addClass('fallback');
+  var $fallback = $(fallbackCardHtml);
+
   $('#result-cards').append($fallback);
-  $('#result-cards .fallback').on('click', function (e) {
+  $('#btn-fallback').on('click', function (e) {
     $('html, body').animate({
       scrollTop: $('#main-header').offset().top
     }, 2000);
+    $('footer').addClass('hidden');
   });
 }
 
 function handleCardClick() {
   // get result index to reference it's details in renderDetails
   $('#result-list').on('click', '.result', function (e) {
-    var thisCardIndex = $(this).find('.label').text(); //get the label number of the card clicked on.
-    resetDetails();
-    handleGetPhotos(state.detailedResults[thisCardIndex - 1]);
-    renderDetails(state.detailedResults[thisCardIndex - 1]);
-    $('html, body').animate({
-      scrollTop: $('#details').offset().top
-    }, 2000);
+    if ($(this).hasClass('fallback')) {
+      return;
+    } else {
+      var thisCardIndex = $(this).find('.label').text(); //get the label number of the card clicked on.
+      resetDetails();
+      handleGetPhotos(state.detailedResults[thisCardIndex - 1]);
+      renderDetails(state.detailedResults[thisCardIndex - 1]);
+      $('html, body').animate({
+        scrollTop: $('#details').offset().top
+      }, 2000);
+    }
   });
 }
 
