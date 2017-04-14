@@ -5,6 +5,7 @@ $(function () {
   handleUseCurrentLocation();
   handleCardClick();
   googleAutoComplete();
+  handleReturnToResults();
 });
 
 function googleAutoComplete() {
@@ -296,6 +297,18 @@ function renderResultCard() {
 
     $('#result-cards').append($res);
   });
+
+  var $fallback = $(resultCardHtml);
+
+  $fallback.find('.name').text('Can\'t find what you\'re looking for?');
+  $fallback.find('.open-closed').text('Click here to try another search.');
+  $fallback.addClass('fallback');
+  $('#result-cards').append($fallback);
+  $('#result-cards .fallback').on('click', function (e) {
+    $('html, body').animate({
+      scrollTop: $('#main-header').offset().top
+    }, 2000);
+  });
 }
 
 function handleCardClick() {
@@ -323,6 +336,8 @@ function renderDetails(thisObjDetails) {
   $('.roaster-banner').css({
     'background-image': 'linear-gradient(to bottom,rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.6)), url("' + thisObjDetails.imgUrls[0] + '")'
   });
+
+  $('footer').removeClass('hidden');
 
 }
 
@@ -422,4 +437,12 @@ function renderReviews(thisObjDetails) {
     });
   }
   return reviewList;
+}
+
+function handleReturnToResults(){
+  $('#return-to-results').click(function(e){
+    $('html, body').animate({
+      scrollTop: $('.wrapper').offset().top
+    }, 2000);
+  });
 }

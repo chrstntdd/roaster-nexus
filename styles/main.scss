@@ -185,6 +185,20 @@ $color5: #783a3a;
   }
 }
 
+footer{
+  background-color: $color2;
+  display: flex;
+  align-content: center;
+  #return-to-results {
+    background-color: $color3;
+    padding: 12px;
+    border: none;
+    color: white;
+    border-radius: 3px;
+    margin: 0 auto 20px auto;
+  }
+}
+
 
 @keyframes spin {
     0% { transform: rotate(0deg); }
