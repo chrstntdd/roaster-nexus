@@ -23,12 +23,19 @@
     height: 25%;
     margin-bottom: 20px; }
   #main-header button {
-    border: none;
-    padding: 12px;
-    background-color: #8c6239;
+    padding: 10px;
+    background-color: transparent;
+    border: 2px solid #783a3a;
+    cursor: pointer;
+    margin: 10px auto 10px auto;
+    display: block;
     color: white;
-    border-radius: 3px;
-    margin-bottom: 10px; }
+    transition: all 0.25s ease-in-out;
+    letter-spacing: 0.05rem; }
+    #main-header button:hover {
+      background-color: #783a3a;
+      color: #322527;
+      letter-spacing: 0.20rem; }
 
 #map {
   background-color: #322527;
@@ -137,10 +144,12 @@
 .review {
   height: 100%;
   width: 100%;
-  border: 3px solid black;
+  border: 3px solid #322527;
   padding: 20px;
   margin-bottom: 40px;
-  overflow: hidden; }
+  overflow: hidden;
+  letter-spacing: 0.01rem;
+  line-height: 1.5rem; }
   .review img {
     float: left;
     height: 100px;
@@ -151,12 +160,38 @@ footer {
   display: flex;
   align-content: center; }
   footer #return-to-results {
-    background-color: #8c6239;
+    width: 90%;
+    border: 3px solid #783a3a;
+    background-color: transparent;
     padding: 12px;
-    border: none;
-    color: white;
-    border-radius: 3px;
-    margin: 0 auto 20px auto; }
+    color: #322527;
+    margin: 0 auto 20px auto;
+    cursor: pointer;
+    transition: all 0.25s ease-in-out; }
+    footer #return-to-results:hover {
+      background-color: #783a3a;
+      color: white;
+      letter-spacing: 0.20rem; }
+
+.fallback {
+  padding: 10px; }
+  .fallback h3 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center; }
+  .fallback #btn-fallback {
+    padding: 10px;
+    background-color: transparent;
+    border: 2px solid #783a3a;
+    width: 85%;
+    cursor: pointer;
+    margin: 10px auto 10px auto;
+    display: block;
+    transition: all 0.25s ease-in-out; }
+    .fallback #btn-fallback:hover {
+      background-color: #783a3a;
+      color: white;
+      letter-spacing: 0.20rem; }
 
 @keyframes spin {
   0% {

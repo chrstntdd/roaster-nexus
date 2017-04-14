@@ -34,12 +34,20 @@ $color5: #783a3a;
     margin-bottom: 20px;
   }
   button {
-    border: none;
-    padding: 12px;
-    background-color: $color3;
+    padding: 10px;
+    background-color: transparent;
+    border: 2px solid $color5;
+    cursor: pointer;
+    margin: 10px auto 10px auto;
+    display: block;
     color: white;
-    border-radius: 3px;
-    margin-bottom: 10px;
+    transition: all 0.25s ease-in-out;
+    letter-spacing: 0.05rem;
+    &:hover{
+      background-color: $color5;
+      color: $color4;
+      letter-spacing: 0.20rem;
+    }
   }
 }
 
@@ -174,10 +182,12 @@ $color5: #783a3a;
 .review {
   height: 100%;
   width: 100%;
-  border: 3px solid black;
+  border: 3px solid $color4;
   padding: 20px;
   margin-bottom: 40px;
   overflow: hidden;
+  letter-spacing: 0.01rem;
+  line-height: 1.5rem;
   img {
     float: left;
     height: 100px;
@@ -190,12 +200,43 @@ footer{
   display: flex;
   align-content: center;
   #return-to-results {
-    background-color: $color3;
+    width: 90%;
+    border: 3px solid $color5;
+    background-color: transparent;
     padding: 12px;
-    border: none;
-    color: white;
-    border-radius: 3px;
+    color: $color4;
     margin: 0 auto 20px auto;
+    cursor: pointer;
+    transition: all 0.25s ease-in-out;
+    &:hover {
+      background-color: $color5;
+      color: white;
+      letter-spacing: 0.20rem;
+    }
+  }
+}
+
+.fallback{
+  padding: 10px;
+  h3{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  #btn-fallback{
+    padding: 10px;
+    background-color: transparent;
+    border: 2px solid $color5;
+    width: 85%;
+    cursor: pointer;
+    margin: 10px auto 10px auto;
+    display: block;
+    transition: all 0.25s ease-in-out;
+    &:hover{
+      background-color: $color5;
+      color: white;
+      letter-spacing: 0.20rem;
+    }
   }
 }
 
