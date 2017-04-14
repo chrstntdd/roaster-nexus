@@ -1,26 +1,28 @@
 'use strict';
 
-$(function(){
+$(function () {
   handleAutocompleteInput();
   handleUseCurrentLocation();
   handleCardClick();
   googleAutoComplete();
 });
 
-function googleAutoComplete (){
+function googleAutoComplete() {
   // allow text input to autocomplete to cities
   var options = {
     types: ['(cities)'],
-    componentRestrictions: {country: 'us'}
+    componentRestrictions: {
+      country: 'us'
+    }
   };
 
   var input = document.getElementById('autocomplete');
   var myAutocomplete = new google.maps.places.Autocomplete(input, options);
 
-  myAutocomplete.addListener('place_changed', function(){
+  myAutocomplete.addListener('place_changed', function () {
     // get geolocation of autocompleted city
     var place = myAutocomplete.getPlace();
-    var pos = {
+    pos = {
       lat: place.geometry.location.lat(),
       lng: place.geometry.location.lng()
     }
@@ -28,9 +30,9 @@ function googleAutoComplete (){
   });
 }
 
-function handleAutocompleteInput (){
+function handleAutocompleteInput() {
   // get user location from autocomplete text input
-  $('#location-form').submit(function(e){
+  $('#location-form').submit(function (e) {
     e.preventDefault();
     var location = $('#location-form input').val();
     this.reset();
@@ -40,8 +42,8 @@ function handleAutocompleteInput (){
   });
 }
 
-function resetDetails(){
-  $('#details').html(''); 
+function resetDetails() {
+  $('#details').html('');
 }
 
 function handleUseCurrentLocation() {
@@ -74,12 +76,13 @@ var state = {
 var myMap;
 var infowindow;
 var labelCount = 1;
+var pos;
 
 function getGeoLatLng() {
   // Try HTML5 geolocation.
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function (position) {
-      var pos = {
+      pos = {
         lat: position.coords.latitude,
         lng: position.coords.longitude
       }
@@ -101,7 +104,7 @@ function getGeoLatLng() {
 }
 
 function initMap(pos) {
-   myMap = new google.maps.Map(document.getElementById('map'), {
+  myMap = new google.maps.Map(document.getElementById('map'), {
     center: {
       lat: pos.lat,
       lng: pos.lng
@@ -129,13 +132,15 @@ function getNearbySearch(pos) {
   service.nearbySearch(request, callback);
 }
 
-function reverseGeocode(pos){
+function reverseGeocode(pos) {
   //convert lat & long from geolocation to a string location
   var geocoder = new google.maps.Geocoder();
-  var latlng = new google.maps.LatLng(pos.lat,pos.lng);
+  var latlng = new google.maps.LatLng(pos.lat, pos.lng);
 
-  geocoder.geocode({'latLng': latlng}, function(results, status){
-    if (status == google.maps.GeocoderStatus.OK){
+  geocoder.geocode({
+    'latLng': latlng
+  }, function (results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
       renderArea((results[1].formatted_address));
     } else {
       //alert the user that their locaiton cannot be determined.
@@ -154,14 +159,14 @@ function handleLocationError(browserHasGeolocation, infowindow, pos) {
 function callback(results, status) {
   if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
     results.map(element => state.results.push(element));
-    state.results.sort((a,b) => parseInt(a.label) - parseInt(b.label)); //sort results by lowest label count to highest
+    state.results.sort((a, b) => parseInt(a.label) - parseInt(b.label)); //sort results by lowest label count to highest
     createMarker();
   } else {
     renderNoResults();
   }
 }
 
-function renderNoResults(){
+function renderNoResults() {
   //ALERT THE USER THAT NO RESULTS WERE FOUND
   $('#location').text('No roasters found in this location.');
 }
@@ -193,9 +198,9 @@ function createMarker() {
 function getPlaceDetails() {
   // aggregate relevant place details
 
- /*BIG thanks to http://bit.ly/2oPkcqa for providing me with the ability 
- to timeout my requests to service.getDetails so not as to hit the query 
- limit  */
+  /*BIG thanks to http://bit.ly/2oPkcqa for providing me with the ability 
+  to timeout my requests to service.getDetails so not as to hit the query 
+  limit  */
   for (var i = 0; i < state.results.length; i++) {
     setTimeout(function (x) {
       return function () {
@@ -209,47 +214,53 @@ function getPlaceDetails() {
   }
 
 
-  function detailsCallback(results, status){
+  function detailsCallback(results, status) {
     //aggregate relevant details from .getDetails and store in global state.
-    if (status == google.maps.places.PlacesServiceStatus.OK){
+    if (status == google.maps.places.PlacesServiceStatus.OK) {
       var details = {
-      name: results.name || null,
-      addr: results.formatted_address,
-      open: results.opening_hours ? results.opening_hours.open_now : null,
-      phone: results.international_phone_number,
-      website: results.website || null,
-      rating: results.rating ? results.rating : null,
-      photos: results.photos ? results.photos : null,
-      photoDimension: {'maxWidth' : (results.photos && results.photos[0].width) ? results.photos[0].width : null,
-                       'maxHeight': (results.photos && results.photos[0].height) ? results.photos[0].height: null
-                      },
-      label: state.detailedResults.length + 1,
-      hours: results.opening_hours ? results.opening_hours.weekday_text : null,
-      reviews: results.reviews ? results.reviews : null,
-      imgUrls: []
-    }
-    state.detailedResults.push(details);
+        name: results.name || null,
+        addr: results.formatted_address ? results.formatted_address : null,
+        open: results.opening_hours ? results.opening_hours.open_now : null,
+        phone: results.international_phone_number ? results.international_phone_number : null,
+        website: results.website || null,
+        rating: results.rating ? results.rating : null,
+        photos: results.photos ? results.photos : null,
+        photoDimension: {
+          'maxWidth': (results.photos && results.photos[0].width) ? results.photos[0].width : null,
+          'maxHeight': (results.photos && results.photos[0].height) ? results.photos[0].height : null
+        },
+        label: state.detailedResults.length + 1,
+        hours: results.opening_hours ? results.opening_hours.weekday_text : null,
+        reviews: results.reviews ? results.reviews : null,
+        imgUrls: [],
+        lat: results.geometry.location.lat(),
+        lng: results.geometry.location.lng()
+      }
+      state.detailedResults.push(details);
 
-    //when loop is finished
-    if (state.detailedResults.length == state.results.length){
-      renderResultCard();
-    }
+      //when loop is finished
+      if (state.detailedResults.length == state.results.length) {
+        renderResultCard();
+      }
 
-    } else if (status == google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT){
+    } else if (status == google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT) {
       console.error(status);
     }
   }
 }
 
-function handleGetPhotos(placeObj){
+function handleGetPhotos(placeObj) {
   // get photo urls from places api using getUrl and add to object
-  placeObj.photos.map(function(photo){
-    var imgUrl = photo.getUrl({'maxWidth': photo.width, 'maxHeight' : photo.height});
+  placeObj.photos.map(function (photo) {
+    var imgUrl = photo.getUrl({
+      'maxWidth': photo.width,
+      'maxHeight': photo.height
+    });
     placeObj.imgUrls.push(imgUrl);
   });
 }
 
-function renderArea(area){
+function renderArea(area) {
   $('#location').text('Coffee roasters in ' + area);
 }
 
@@ -278,10 +289,10 @@ function renderResultCard() {
     $res.find('.label').text(element.label);
     $res.find('.address').text(element.addr);
     $res.find('.open-closed').text(element.open ? 'Open now' : 'Closed');
-    $res.find('.rating').text(element.rating == null ? 'No rating.' : 'Rating: ' + element.rating);
-    $res.find('img').attr('src', element.photos ? 
-                                 element.photos[0].getUrl(element.photoDimension) : 
-                                 'https://images.unsplash.com/photo-1442411210769-b95c4632195e?dpr=2&auto=format&fit=crop&w=1199&h=799&q=80&cs=tinysrgb&crop=&bg=');
+    $res.find('.rating').text(element.rating == null ? 'No rating.' : 'Rating: ' + element.rating + '/5');
+    $res.find('img').attr('src', element.photos ?
+      element.photos[0].getUrl(element.photoDimension) :
+      'https://images.unsplash.com/photo-1442411210769-b95c4632195e?dpr=2&auto=format&fit=crop&w=1199&h=799&q=80&cs=tinysrgb&crop=&bg=');
 
     $('#result-cards').append($res);
   });
@@ -310,13 +321,15 @@ function renderDetails(thisObjDetails) {
   $('#contact, #feedback').wrapAll('<div id="details-wrapper"></div>');
 
   $('.roaster-banner').css({
-    'background-image' : 'linear-gradient(to bottom,rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.6)), url("' + thisObjDetails.imgUrls[0] + '")'
+    'background-image': 'linear-gradient(to bottom,rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.6)), url("' + thisObjDetails.imgUrls[0] + '")'
   });
 
 }
 
 function renderHeader(thisObjDetails) {
   // bind object details to header
+
+  var googleMapsBaseUrl = 'http://maps.google.com/maps?daddr=';
 
   var headerHtml = (
     '<header class="roaster-banner">' +
@@ -330,7 +343,7 @@ function renderHeader(thisObjDetails) {
   var $header = $(headerHtml);
 
   $header.find('h1').text(thisObjDetails.name);
-  $header.find('h3').html('<i class="fa fa-map-marker" aria-hidden="true"></i> ' + thisObjDetails.addr);
+  $header.find('h3').html('<a href="' + googleMapsBaseUrl + thisObjDetails.lat + ',' + thisObjDetails.lng + '" target="_blank"><i class="fa fa-map-marker" aria-hidden="true"></i> ' + thisObjDetails.addr + '</a>');
 
   return $header
 }
@@ -354,7 +367,7 @@ function renderContact(thisObjDetails) {
   var $contact = $(contactHtml);
 
   $contact.find('#hours').html(hours ? hours : 'No hours available.');
-  $contact.find('#phone').text(thisObjDetails.phone);
+  $contact.find('#phone').text(thisObjDetails.phone != null ? thisObjDetails.phone : 'No phone number available.');
   $contact.find('#website').attr('href', thisObjDetails.website).text(thisObjDetails.website);
 
   return $contact;
@@ -372,9 +385,9 @@ function renderFeedback(thisObjDetails) {
 
   var $feedback = $(feedbackHtml);
 
-  $feedback.find('#rating').text(thisObjDetails.rating != null ? 
-                                'AVERAGE RATING ' + thisObjDetails.rating + '/5' : 
-                                'No rating for this roaster.')
+  $feedback.find('#rating').text(thisObjDetails.rating != null ?
+    'AVERAGE RATING ' + thisObjDetails.rating + '/5' :
+    'No rating for this roaster.')
   $feedback.find('ul').html(renderReviews(thisObjDetails));
 
   return $feedback;
@@ -384,25 +397,29 @@ function renderReviews(thisObjDetails) {
   // return review html back to renderFeedback() as an array
   var reviewList = [];
 
-  thisObjDetails.reviews.map(function (review) {
-    var reviewHtml = (
-      '<li>' +
-      '<article class="review">' +
-      '<img src="" alt="">' +
-      '<h4></h4>' +
-      '<p id="rating"></p>' +
-      '<p id="desc"></p>' +
-      '</article>' +
-      '</li>'
-    );
+  if (thisObjDetails.reviews == null) {
+    return reviewList;
+  } else {
+    thisObjDetails.reviews.map(function (review) {
+      var reviewHtml = (
+        '<li>' +
+        '<article class="review">' +
+        '<img src="" alt="">' +
+        '<h4></h4>' +
+        '<p id="rating"></p>' +
+        '<p id="desc"></p>' +
+        '</article>' +
+        '</li>'
+      );
 
-    var $review = $(reviewHtml);
+      var $review = $(reviewHtml);
 
-    $review.find('img').attr('src', review.profile_photo_url);
-    $review.find('h4').html('<a href="' + review.author_url + '">' + review.author_name + '</a>');
-    $review.find('#desc').text(review.text);
-    $review.find('#rating').text( review.rating + '/5');
-    reviewList.push($review);
-  });
+      $review.find('img').attr('src', review.profile_photo_url);
+      $review.find('h4').html('<a href="' + review.author_url + '">' + review.author_name + '</a>');
+      $review.find('#desc').text(review.text);
+      $review.find('#rating').text(review.rating + '/5');
+      reviewList.push($review);
+    });
+  }
   return reviewList;
 }
