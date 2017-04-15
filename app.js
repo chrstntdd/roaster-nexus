@@ -310,7 +310,7 @@ function renderResultCard() {
   var $fallback = $(fallbackCardHtml);
 
   $('#result-cards').append($fallback);
-  $('#btn-fallback').on('click', function (e) {
+  $('#btn-fallback').on('click touchstart', function (e) {
     $('html, body').animate({
       scrollTop: $('#main-header').offset().top
     }, 2000);
@@ -320,7 +320,7 @@ function renderResultCard() {
 
 function handleCardClick() {
   // get result index to reference it's details in renderDetails
-  $('#result-list').on('click', '.result', function (e) {
+  $('#result-list').on('click touchstart', '.result', function (e) {
     if ($(this).hasClass('fallback')) {
       return;
     } else {
@@ -457,3 +457,5 @@ function handleReturnToResults(){
     }, 2000);
   });
 }
+
+// TODO: hide map for mobile users behind a button press.
