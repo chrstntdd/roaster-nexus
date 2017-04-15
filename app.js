@@ -311,6 +311,7 @@ function renderResultCard() {
 
   $('#result-cards').append($fallback);
   $('#btn-fallback').on('click touchstart', function (e) {
+    e.preventDefault();
     $('body').animate({
       scrollTop: $('#main-header').offset().top
     }, 2000);
@@ -321,6 +322,7 @@ function renderResultCard() {
 function handleCardClick() {
   // get result index to reference its details in renderDetails
   $('#result-list').on('click touchstart', '.name', function (e) {
+    e.preventDefault();
     var thisCardIndex = $(this).siblings('.label').text(); //get the label number of the card clicked on.
     resetDetails();
     handleGetPhotos(state.detailedResults[thisCardIndex - 1]);
@@ -448,6 +450,7 @@ function renderReviews(thisObjDetails) {
 
 function handleReturnToResults(){
   $('#return-to-results').on('click touchstart', function(e){
+    e.preventDefault();
     $('body').animate({
       scrollTop: $('.wrapper').offset().top
     }, 2000);
