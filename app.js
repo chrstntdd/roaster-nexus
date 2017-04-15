@@ -6,6 +6,7 @@ $(function () {
   handleCardClick();
   googleAutoComplete();
   handleReturnToResults();
+  testScreenSize();
 });
 
 function googleAutoComplete() {
@@ -262,6 +263,7 @@ function handleGetPhotos(placeObj) {
 }
 
 function renderArea(area) {
+  $('.loading').addClass('hidden');
   $('#location').text('Coffee roasters in ' + area);
 }
 
@@ -455,6 +457,13 @@ function handleReturnToResults(){
       scrollTop: $('.wrapper').offset().top
     }, 2000);
   });
+}
+
+function testScreenSize(){
+  // if mobile, hide map.
+  if ($('#result-list').css('width') == '100%'){
+    $('#map').hide();
+  }
 }
 
 // TODO: hide map for mobile users behind a button press.

@@ -56,15 +56,6 @@ $color5: #783a3a;
   height: 100%;
   width: 70%;
   float: left;
-  .loader {
-    border: 16px solid $color2;
-    border-top: 16px solid $color5;
-    border-radius: 50%;
-    width: 100px;
-    height: 100px;
-    animation: spin 2s linear infinite;
-    margin: 40vh auto 0 auto;
-  }
 }
 
 .wrapper {
@@ -250,6 +241,18 @@ footer{
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+$spinner-size: 20vh;
+
+.loading {
+  border-radius: 50%;
+  width: $spinner-size;
+  height: $spinner-size;
+  border: .25rem solid rgba(white, 0.2);
+  border-top-color: $color5;
+  animation: spin 1s infinite linear;
+  margin: 35vh auto 0 auto;
 }
 
 
