@@ -50,7 +50,7 @@ function resetDetails() {
 
 function handleUseCurrentLocation() {
   // get user location from geolocation button
-  $('#current-loc-btn').on('click touchstart' ,function (e) {
+  $('#current-loc-btn').on('click  ' ,function (e) {
     getGeoLatLng();
     scrollToResults();
   });
@@ -312,7 +312,7 @@ function renderResultCard() {
   var $fallback = $(fallbackCardHtml);
 
   $('#result-cards').append($fallback);
-  $('#btn-fallback').on('click touchstart', function (e) {
+  $('#btn-fallback').on('click  ', function (e) {
     e.preventDefault();
     $('body').animate({
       scrollTop: $('#main-header').offset().top
@@ -323,7 +323,7 @@ function renderResultCard() {
 
 function handleCardClick() {
   // get result index to reference its details in renderDetails
-  $('#result-list').on('click touchstart', '.name', function (e) {
+  $('#result-list').on('click  ', '.name', function (e) {
     e.preventDefault();
     var thisCardIndex = $(this).siblings('.label').text(); //get the label number of the card clicked on.
     resetDetails();
@@ -451,7 +451,7 @@ function renderReviews(thisObjDetails) {
 }
 
 function handleReturnToResults(){
-  $('#return-to-results').on('click touchstart', function(e){
+  $('#return-to-results').on('click  ', function(e){
     e.preventDefault();
     $('body').animate({
       scrollTop: $('.wrapper').offset().top
