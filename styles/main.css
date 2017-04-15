@@ -196,6 +196,15 @@ footer {
       color: white;
       letter-spacing: 0.20rem; }
 
+a[href^="http://maps.google.com/maps"] {
+  display: none !important; }
+
+a[href^="https://maps.google.com/maps"] {
+  display: none !important; }
+
+.gmnoprint a, .gmnoprint span, .gm-style-cc {
+  display: none; }
+
 @keyframes spin {
   0% {
     transform: rotate(0deg); }
