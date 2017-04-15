@@ -60,6 +60,7 @@
   float: left;
   background-color: #623a30;
   overflow: scroll;
+  -webkit-overflow-scrolling: touch;
   height: 100%; }
 
 #result-cards {

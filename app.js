@@ -58,7 +58,7 @@ function handleUseCurrentLocation() {
 function scrollToResults() {
   // scroll to results and remove old data from view
   $('.wrapper').removeClass('hidden');
-  $('html, body').animate({
+  $('body').animate({
     scrollTop: $('.wrapper').offset().top
   }, 2000);
   $('#location, #result-cards').html('');
@@ -311,7 +311,7 @@ function renderResultCard() {
 
   $('#result-cards').append($fallback);
   $('#btn-fallback').on('click touchstart', function (e) {
-    $('html, body').animate({
+    $('body').animate({
       scrollTop: $('#main-header').offset().top
     }, 2000);
     $('footer').addClass('hidden');
@@ -328,7 +328,7 @@ function handleCardClick() {
       resetDetails();
       handleGetPhotos(state.detailedResults[thisCardIndex - 1]);
       renderDetails(state.detailedResults[thisCardIndex - 1]);
-      $('html, body').animate({
+      $('body').animate({
         scrollTop: $('#details').offset().top
       }, 2000);
     }
@@ -452,7 +452,7 @@ function renderReviews(thisObjDetails) {
 
 function handleReturnToResults(){
   $('#return-to-results').click(function(e){
-    $('html, body').animate({
+    $('body').animate({
       scrollTop: $('.wrapper').offset().top
     }, 2000);
   });
