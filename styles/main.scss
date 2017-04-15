@@ -93,14 +93,16 @@ $color5: #783a3a;
   div {
     padding: 10px;
   }
-  p, h3{
+  p{
+    margin: 0;
+  }
+  h3 {
+    color: $color1;
+    cursor: pointer;
     margin: 0;
   }
   img {
     max-width: 100%;
-  }
-  :hover{
-    cursor: pointer;
   }
 }
 

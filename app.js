@@ -49,7 +49,7 @@ function resetDetails() {
 
 function handleUseCurrentLocation() {
   // get user location from geolocation button
-  $('#current-loc-btn').click(function (e) {
+  $('#current-loc-btn').on('click touchstart' ,function (e) {
     getGeoLatLng();
     scrollToResults();
   });
@@ -272,7 +272,7 @@ function renderResultCard() {
     '<li>' +
     '<article class="result">' +
     '<img src="" alt="">' +
-    '<div>' +
+    '<div class="glace-wrapper">' +
     '<p class="label"></p>' +
     '<h3 class="name"></h3>' +
     '<p class="open-closed"></p>' +
@@ -319,19 +319,15 @@ function renderResultCard() {
 }
 
 function handleCardClick() {
-  // get result index to reference it's details in renderDetails
-  $('#result-list').on('click touchstart', '.result', function (e) {
-    if ($(this).hasClass('fallback')) {
-      return;
-    } else {
-      var thisCardIndex = $(this).find('.label').text(); //get the label number of the card clicked on.
-      resetDetails();
-      handleGetPhotos(state.detailedResults[thisCardIndex - 1]);
-      renderDetails(state.detailedResults[thisCardIndex - 1]);
-      $('body').animate({
-        scrollTop: $('#details').offset().top
-      }, 2000);
-    }
+  // get result index to reference its details in renderDetails
+  $('#result-list').on('click touchstart', '.name', function (e) {
+    var thisCardIndex = $(this).siblings('.label').text(); //get the label number of the card clicked on.
+    resetDetails();
+    handleGetPhotos(state.detailedResults[thisCardIndex - 1]);
+    renderDetails(state.detailedResults[thisCardIndex - 1]);
+    $('body').animate({
+      scrollTop: $('#details').offset().top
+    }, 2000);
   });
 }
 
@@ -451,7 +447,7 @@ function renderReviews(thisObjDetails) {
 }
 
 function handleReturnToResults(){
-  $('#return-to-results').click(function(e){
+  $('#return-to-results').on('click touchstart', function(e){
     $('body').animate({
       scrollTop: $('.wrapper').offset().top
     }, 2000);
