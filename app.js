@@ -1,7 +1,6 @@
 'use strict';
 
 $(function () {
-  handleAutocompleteInput();
   handleUseCurrentLocation();
   handleCardClick();
   googleAutoComplete();
@@ -29,18 +28,9 @@ function googleAutoComplete() {
       lng: place.geometry.location.lng()
     }
     initMap(pos);
-  });
-}
-
-function handleAutocompleteInput() {
-  // get user location from autocomplete text input
-  $('#location-form').submit(function (e) {
-    e.preventDefault();
-    var location = $('#location-form input').val();
-    this.reset();
     resetDetails();
-    scrollToResults();
-    renderArea(location);
+    scrollToResults()
+    renderArea(place.formatted_address);
   });
 }
 
