@@ -29,7 +29,8 @@ function googleAutoComplete() {
     }
     initMap(pos);
     resetDetails();
-    scrollToResults()
+    $('.loading').removeClass('hidden');
+    scrollToResults();
     renderArea(place.formatted_address);
   });
 }
@@ -41,6 +42,8 @@ function resetDetails() {
 function handleUseCurrentLocation() {
   // get user location from geolocation button
   $('#current-loc-btn').on('click  ' ,function (e) {
+    $('.loading').removeClass('hidden');
+    resetDetails();
     getGeoLatLng();
     scrollToResults();
   });
@@ -87,6 +90,7 @@ function getGeoLatLng() {
       myMap.setCenter(pos);
 
     }, function () {
+      // Browser supports Geolocation, but the service failed
       handleLocationError(true, infowindow, myMap.getCenter());
     });
   } else {
@@ -144,7 +148,7 @@ function reverseGeocode(pos) {
 function handleLocationError(browserHasGeolocation, infowindow, pos) {
   infowindow.setPosition(pos);
   infowindow.setContent(browserHasGeolocation ?
-    'Error: The Geolocation service failed.' :
+    'Error: The Geolocation service failed. Try entering in your city.' :
     'Error: Your browser doesn\'t support geolocation.');
 }
 
@@ -160,7 +164,8 @@ function callback(results, status) {
 
 function renderNoResults() {
   //ALERT THE USER THAT NO RESULTS WERE FOUND
-  $('#location').text('No roasters found in this location.');
+  $('.loading').addClass('hidden');
+  renderFallbackCard();
 }
 
 function createMarker() {
@@ -253,12 +258,12 @@ function handleGetPhotos(placeObj) {
 }
 
 function renderArea(area) {
-  $('.loading').addClass('hidden');
   $('#location').text('Coffee roasters in ' + area);
 }
 
 function renderResultCard() {
   //render place details into the DOM
+  $('.loading').addClass('hidden');
 
   var resultCardHtml = (
     '<li>' +
@@ -289,7 +294,10 @@ function renderResultCard() {
 
     $('#result-cards').append($res);
   });
+  renderFallbackCard();
+}
 
+function renderFallbackCard() {
   var fallbackCardHtml = (
     '<li>' +
     '<article class="result fallback">' +
@@ -414,7 +422,7 @@ function renderReviews(thisObjDetails) {
   var reviewList = [];
 
   if (thisObjDetails.reviews == null) {
-    return reviewList;
+    return '<p>No reviews available.</p>'
   } else {
     thisObjDetails.reviews.map(function (review) {
       var reviewHtml = (

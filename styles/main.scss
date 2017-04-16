@@ -253,6 +253,11 @@ $spinner-size: 20vh;
   border-top-color: $color5;
   animation: spin 1s infinite linear;
   margin: 35vh auto 0 auto;
+  z-index: 7;
+}
+
+#contact{
+  margin-bottom: 20px;
 }
 
 
