@@ -63,12 +63,16 @@ function handleUseCurrentLocation() {
   });
 }
 
+function scrollToSection(pageLocation){
+  $('body, html').animate({
+    scrollTop: $(pageLocation).offset().top
+  }, 2000);
+}
+
 function scrollToResults() {
   // scroll to results and remove old data from view
   $('.wrapper').removeClass('hidden');
-  $('body').animate({
-    scrollTop: $('.wrapper').offset().top
-  }, 2000);
+  scrollToSection('.wrapper');
   $('#location, #result-cards').html('');
   state = {
     results: [],
@@ -151,7 +155,8 @@ function reverseGeocode(pos) {
     'latLng': latlng
   }, function (results, status) {
     if (status == google.maps.GeocoderStatus.OK) {
-      renderArea((results[1].formatted_address));
+      console.log(results);
+      renderArea(results[1].address_components[0].short_name);
     } else {
       //alert the user that their locaiton cannot be determined.
       console.error('Can\'t reverse geocode this locaiton');
@@ -168,6 +173,7 @@ function handleLocationError(browserHasGeolocation, infowindow, pos) {
 
 function callback(results, status) {
   if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+    console.log(results);
     results.map(element => state.results.push(element));
     state.results.sort((a, b) => parseInt(a.label) - parseInt(b.label)); //sort results by lowest label count to highest
     createMarker();
@@ -272,7 +278,7 @@ function handleGetPhotos(placeObj) {
 }
 
 function renderArea(area) {
-  $('#location').text('Coffee roasters in ' + area);
+  $('#location').text('Coffee roasters near ' + area);
 }
 
 function renderResultCard() {
@@ -326,9 +332,7 @@ function renderFallbackCard() {
   $('#result-cards').append($fallback);
   $('#btn-fallback').on('click  ', function (e) {
     e.preventDefault();
-    $('body').animate({
-      scrollTop: $('#main-header').offset().top
-    }, 2000);
+    scrollToSection('#main-header');
     $('footer').addClass('hidden');
   });
 }
@@ -341,9 +345,7 @@ function handleCardClick() {
     resetDetails();
     handleGetPhotos(state.detailedResults[thisCardIndex - 1]);
     renderDetails(state.detailedResults[thisCardIndex - 1]);
-    $('body').animate({
-      scrollTop: $('#details').offset().top
-    }, 2000);
+    scrollToSection('#details');
   });
 }
 
@@ -465,9 +467,7 @@ function renderReviews(thisObjDetails) {
 function handleReturnToResults() {
   $('#return-to-results').on('click  ', function (e) {
     e.preventDefault();
-    $('body').animate({
-      scrollTop: $('.wrapper').offset().top
-    }, 2000);
+    scrollToSection('.wrapper');
   });
 }
 
