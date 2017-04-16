@@ -6,7 +6,15 @@ $(function () {
   googleAutoComplete();
   handleReturnToResults();
   testScreenSize();
+  resetInput();
 });
+
+function resetInput() {
+  $('#autocomplete').on('focus', function (e) {
+    e.preventDefault();
+    $(this).val('')
+  });
+}
 
 function googleAutoComplete() {
   // allow text input to autocomplete to cities
@@ -29,10 +37,16 @@ function googleAutoComplete() {
     }
     initMap(pos);
     resetDetails();
-    $('.loading').removeClass('hidden');
+    showLoader(true);
     scrollToResults();
     renderArea(place.formatted_address);
   });
+}
+
+function showLoader(boolean) {
+  boolean ?
+    $('.loading').removeClass('hidden') :
+    $('.loading').addClass('hidden');
 }
 
 function resetDetails() {
@@ -41,8 +55,8 @@ function resetDetails() {
 
 function handleUseCurrentLocation() {
   // get user location from geolocation button
-  $('#current-loc-btn').on('click  ' ,function (e) {
-    $('.loading').removeClass('hidden');
+  $('#current-loc-btn').on('click  ', function (e) {
+    showLoader(true);
     resetDetails();
     getGeoLatLng();
     scrollToResults();
@@ -164,7 +178,7 @@ function callback(results, status) {
 
 function renderNoResults() {
   //ALERT THE USER THAT NO RESULTS WERE FOUND
-  $('.loading').addClass('hidden');
+  showLoader(false);
   renderFallbackCard();
 }
 
@@ -263,7 +277,7 @@ function renderArea(area) {
 
 function renderResultCard() {
   //render place details into the DOM
-  $('.loading').addClass('hidden');
+  showLoader(false);
 
   var resultCardHtml = (
     '<li>' +
@@ -448,8 +462,8 @@ function renderReviews(thisObjDetails) {
   return reviewList;
 }
 
-function handleReturnToResults(){
-  $('#return-to-results').on('click  ', function(e){
+function handleReturnToResults() {
+  $('#return-to-results').on('click  ', function (e) {
     e.preventDefault();
     $('body').animate({
       scrollTop: $('.wrapper').offset().top
@@ -457,9 +471,9 @@ function handleReturnToResults(){
   });
 }
 
-function testScreenSize(){
+function testScreenSize() {
   // if mobile, hide map.
-  if ($('#result-list').css('width') == '100%'){
+  if ($('#result-list').css('width') == '100%') {
     $('#map').hide();
   }
 }
