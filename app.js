@@ -175,7 +175,6 @@ function callback(results, status) {
   if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
     console.log(results);
     results.map(element => state.results.push(element));
-    state.results.sort((a, b) => parseInt(a.label) - parseInt(b.label)); //sort results by lowest label count to highest
     createMarker();
   } else {
     renderNoResults();
@@ -209,60 +208,44 @@ function createMarker() {
       infowindow.open(map, this);
     });
   });
-  getPlaceDetails();
+  renderResultCard();
 }
 
-function getPlaceDetails() {
-  // aggregate relevant place details
+function getPlaceDetails(place_id) {
+  // aggregate relevant place details for the selected roaster
+  var request = {
+    placeId: place_id
+  };
+  var service = new google.maps.places.PlacesService(myMap);
+  service.getDetails(request, detailsCallback);
+}
 
-  /*BIG thanks to http://bit.ly/2oPkcqa for providing me with the ability 
-  to timeout my requests to service.getDetails so not as to hit the query 
-  limit  */
-  for (var i = 0; i < state.results.length; i++) {
-    setTimeout(function (x) {
-      return function () {
-        var request = {
-          placeId: state.results[x].place_id
-        };
-        var service = new google.maps.places.PlacesService(myMap);
-        service.getDetails(request, detailsCallback);
-      };
-    }(i), 300 * i);
-  }
-
-
-  function detailsCallback(results, status) {
-    //aggregate relevant details from .getDetails and store in global state.
-    if (status == google.maps.places.PlacesServiceStatus.OK) {
-      var details = {
-        name: results.name || null,
-        addr: results.formatted_address ? results.formatted_address : null,
-        open: results.opening_hours ? results.opening_hours.open_now : null,
-        phone: results.international_phone_number ? results.international_phone_number : null,
-        website: results.website || null,
-        rating: results.rating ? results.rating : null,
-        photos: results.photos ? results.photos : null,
-        photoDimension: {
-          'maxWidth': (results.photos && results.photos[0].width) ? results.photos[0].width : null,
-          'maxHeight': (results.photos && results.photos[0].height) ? results.photos[0].height : null
-        },
-        label: state.detailedResults.length + 1,
-        hours: results.opening_hours ? results.opening_hours.weekday_text : null,
-        reviews: results.reviews ? results.reviews : null,
-        imgUrls: [],
-        lat: results.geometry.location.lat(),
-        lng: results.geometry.location.lng()
-      }
-      state.detailedResults.push(details);
-
-      //when loop is finished
-      if (state.detailedResults.length == state.results.length) {
-        renderResultCard();
-      }
-
-    } else if (status == google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT) {
-      console.error(status);
+function detailsCallback(results, status) {
+  //aggregate relevant details from .getDetails and store in global state.
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+    var details = {
+      name: results.name || null,
+      addr: results.formatted_address ? results.formatted_address : null,
+      open: results.opening_hours ? results.opening_hours.open_now : null,
+      phone: results.international_phone_number ? results.international_phone_number : null,
+      website: results.website || null,
+      rating: results.rating ? results.rating : null,
+      photos: results.photos ? results.photos : null,
+      photoDimension: {
+        'maxWidth': (results.photos && results.photos[0].width) ? results.photos[0].width : null,
+        'maxHeight': (results.photos && results.photos[0].height) ? results.photos[0].height : null
+      },
+      label: state.detailedResults.length + 1,
+      hours: results.opening_hours ? results.opening_hours.weekday_text : null,
+      reviews: results.reviews ? results.reviews : null,
+      imgUrls: [],
+      lat: results.geometry.location.lat(),
+      lng: results.geometry.location.lng()
     }
+    state.detailedResults.push(details);
+
+  } else if (status == google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT) {
+    console.error(status);
   }
 }
 
@@ -300,21 +283,27 @@ function renderResultCard() {
     '</li>'
   );
 
-  state.detailedResults.map(function (element) {
+  state.results.map(function (element) {
     var $res = $(resultCardHtml);
 
     $res.find('.name').text(element.name);
     $res.find('.label').text(element.label);
-    $res.find('.address').text(element.addr);
+    $res.find('.address').text(element.vicinity);
     $res.find('.open-closed').text(element.open ? 'Open now' : 'Closed');
     $res.find('.rating').text(element.rating == null ? 'No rating.' : 'Rating: ' + element.rating + '/5');
-    $res.find('img').attr('src', element.photos ?
-      element.photos[0].getUrl(element.photoDimension) :
-      'https://images.unsplash.com/photo-1442411210769-b95c4632195e?dpr=2&auto=format&fit=crop&w=1199&h=799&q=80&cs=tinysrgb&crop=&bg=');
+    $res.find('img').attr('src', element.photos ? getPhotoUrl(element.photos[0], 2) : 'http://bit.ly/2oNpyEE')
 
     $('#result-cards').append($res);
   });
   renderFallbackCard();
+}
+
+function getPhotoUrl(placePhotoObject, resolution) {
+  var photoDimension = {
+    'maxWidth': parseInt(placePhotoObject.width / resolution),
+    'maxHeight': parseInt(placePhotoObject.height / resolution)
+  }
+  return placePhotoObject.getUrl(photoDimension);
 }
 
 function renderFallbackCard() {
