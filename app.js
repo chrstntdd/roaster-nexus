@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 $(function () {
   handleUseCurrentLocation();
@@ -12,7 +12,7 @@ $(function () {
 function resetInput() {
   $('#autocomplete').on('focus', function (e) {
     e.preventDefault();
-    $(this).val('')
+    $(this).val('');
   });
 }
 
@@ -34,7 +34,7 @@ function googleAutoComplete() {
     pos = {
       lat: place.geometry.location.lat(),
       lng: place.geometry.location.lng()
-    }
+    };
     initMap(pos);
     resetDetails();
     showLoader(true);
@@ -63,7 +63,7 @@ function handleUseCurrentLocation() {
   });
 }
 
-function scrollToSection(pageLocation){
+function scrollToSection(pageLocation) {
   $('body, html').animate({
     scrollTop: $(pageLocation).offset().top
   }, 2000);
@@ -77,13 +77,13 @@ function scrollToResults() {
   state = {
     results: [],
     detailedResults: []
-  }
+  };
   labelCount = 1;
 }
 
 var state = {
   results: []
-}
+};
 
 var myMap;
 var infowindow;
@@ -97,7 +97,7 @@ function getGeoLatLng() {
       pos = {
         lat: position.coords.latitude,
         lng: position.coords.longitude
-      }
+      };
 
       reverseGeocode(pos);
       initMap(pos);
@@ -113,7 +113,7 @@ function getGeoLatLng() {
   } else {
     // Browser doesn't support Geolocation
     handleLocationError(false, infowindow, myMap.getCenter());
-  };
+  }
 }
 
 function initMap(pos) {
@@ -153,14 +153,14 @@ function reverseGeocode(pos) {
   geocoder.geocode({
     'latLng': latlng
   }, function (results, status) {
-    if (status == google.maps.GeocoderStatus.OK) {
+    if (status === google.maps.GeocoderStatus.OK) {
       console.log(results);
       renderArea(results[1].address_components[0].short_name);
     } else {
       //alert the user that their locaiton cannot be determined.
       console.error('Can\'t reverse geocode this locaiton');
     }
-  })
+  });
 }
 
 function handleLocationError(browserHasGeolocation, infowindow, pos) {
@@ -191,7 +191,7 @@ function createMarker() {
     var placeLoc = {
       lat: element.geometry.location.lat(),
       lng: element.geometry.location.lng()
-    }
+    };
     var marker = new google.maps.Marker({
       position: placeLoc,
       label: labelCount.toString(),
@@ -221,7 +221,7 @@ function getPlaceDetails(place_id) {
 
 function detailsCallback(results, status) {
   // aggregate relevant details from .getDetails and store in global state.
-  if (status == google.maps.places.PlacesServiceStatus.OK) {
+  if (status === google.maps.places.PlacesServiceStatus.OK) {
     state.detailedResults = {
       name: results.name || null,
       addr: results.formatted_address ? results.formatted_address : null,
@@ -239,7 +239,7 @@ function detailsCallback(results, status) {
       imgUrls: [],
       lat: results.geometry.location.lat(),
       lng: results.geometry.location.lng()
-    }
+    };
   } else {
     console.error(status);
   }
@@ -277,8 +277,8 @@ function renderResultCard() {
     $res.find('.label').text(element.label);
     $res.find('.address').text(element.vicinity);
     $res.find('.open-closed').text(element.open ? 'Open now' : 'Closed');
-    $res.find('.rating').text(element.rating == null ? 'No rating.' : 'Rating: ' + element.rating + '/5');
-    $res.find('img').attr('src', element.photos ? getPhotoUrl(element.photos[0], 2) : 'http://bit.ly/2oNpyEE')
+    $res.find('.rating').text(element.rating === null ? 'No rating.' : 'Rating: ' + element.rating + '/5');
+    $res.find('img').attr('src', element.photos ? getPhotoUrl(element.photos[0], 2) : 'http://bit.ly/2oNpyEE');
 
     $('#result-cards').append($res);
   });
@@ -290,7 +290,7 @@ function getPhotoUrl(placePhotoObject, resolution) {
   var photoDimension = {
     'maxWidth': parseInt(placePhotoObject.width / resolution),
     'maxHeight': parseInt(placePhotoObject.height / resolution)
-  }
+  };
   return placePhotoObject.getUrl(photoDimension);
 }
 
@@ -302,7 +302,7 @@ function renderFallbackCard() {
     '<button id="btn-fallback">TRY ANOTHER SEARCH</button>' +
     '</article>' +
     '</li>'
-  )
+  );
 
   var $fallback = $(fallbackCardHtml);
 
@@ -372,7 +372,7 @@ function renderHeader(thisObjDetails) {
   $header.find('h1').text(thisObjDetails.name);
   $header.find('h3').html('<a href="' + GOOGLEMAPSBASEURL + thisObjDetails.lat + ',' + thisObjDetails.lng + '" target="_blank"><i class="fa fa-map-marker" aria-hidden="true"></i> ' + thisObjDetails.addr + '</a>');
 
-  return $header
+  return $header;
 }
 
 function renderContact(thisObjDetails) {
@@ -412,9 +412,9 @@ function renderFeedback(thisObjDetails) {
 
   var $feedback = $(feedbackHtml);
 
-  $feedback.find('#rating').text(thisObjDetails.rating != null ?
+  $feedback.find('#rating').text(thisObjDetails.rating !== null ?
     'AVERAGE RATING ' + thisObjDetails.rating + '/5' :
-    'No rating for this roaster.')
+    'No rating for this roaster.');
   $feedback.find('ul').html(renderReviews(thisObjDetails));
 
   return $feedback;
@@ -424,8 +424,8 @@ function renderReviews(thisObjDetails) {
   // return review html back to renderFeedback() as an array
   var reviewList = [];
 
-  if (thisObjDetails.reviews == null) {
-    return '<p>No reviews available.</p>'
+  if (thisObjDetails.reviews === null) {
+    return '<p>No reviews available.</p>';
   } else {
     thisObjDetails.reviews.map(function (review) {
       var reviewHtml = (
@@ -460,7 +460,7 @@ function handleReturnToResults() {
 
 function testScreenSize() {
   // if mobile, hide map.
-  if ($('#result-list').css('width') == '100%') {
+  if ($('#result-list').css('width') === '100%') {
     $('#map').hide();
   }
 }
