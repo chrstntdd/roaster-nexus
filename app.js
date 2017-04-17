@@ -82,8 +82,7 @@ function scrollToResults() {
 }
 
 var state = {
-  results: [],
-  detailedResults: []
+  results: []
 }
 
 var myMap;
@@ -212,7 +211,7 @@ function createMarker() {
 }
 
 function getPlaceDetails(place_id) {
-  // aggregate relevant place details for the selected roaster
+  // make the request to get more details about a selected roaster
   var request = {
     placeId: place_id
   };
@@ -221,9 +220,9 @@ function getPlaceDetails(place_id) {
 }
 
 function detailsCallback(results, status) {
-  //aggregate relevant details from .getDetails and store in global state.
+  // aggregate relevant details from .getDetails and store in global state.
   if (status == google.maps.places.PlacesServiceStatus.OK) {
-    var details = {
+    state.detailedResults = {
       name: results.name || null,
       addr: results.formatted_address ? results.formatted_address : null,
       open: results.opening_hours ? results.opening_hours.open_now : null,
@@ -235,29 +234,17 @@ function detailsCallback(results, status) {
         'maxWidth': (results.photos && results.photos[0].width) ? results.photos[0].width : null,
         'maxHeight': (results.photos && results.photos[0].height) ? results.photos[0].height : null
       },
-      label: state.detailedResults.length + 1,
       hours: results.opening_hours ? results.opening_hours.weekday_text : null,
       reviews: results.reviews ? results.reviews : null,
       imgUrls: [],
       lat: results.geometry.location.lat(),
       lng: results.geometry.location.lng()
     }
-    state.detailedResults.push(details);
-
-  } else if (status == google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT) {
+  } else {
     console.error(status);
   }
-}
-
-function handleGetPhotos(placeObj) {
-  // get photo urls from places api using getUrl and add to object
-  placeObj.photos.map(function (photo) {
-    var imgUrl = photo.getUrl({
-      'maxWidth': photo.width,
-      'maxHeight': photo.height
-    });
-    placeObj.imgUrls.push(imgUrl);
-  });
+  // once the details have been stored in the global state
+  renderDetails(state.detailedResults);
 }
 
 function renderArea(area) {
@@ -299,6 +286,7 @@ function renderResultCard() {
 }
 
 function getPhotoUrl(placePhotoObject, resolution) {
+  // return image url
   var photoDimension = {
     'maxWidth': parseInt(placePhotoObject.width / resolution),
     'maxHeight': parseInt(placePhotoObject.height / resolution)
@@ -328,18 +316,28 @@ function renderFallbackCard() {
 
 function handleCardClick() {
   // get result index to reference its details in renderDetails
-  $('#result-list').on('click  ', '.name', function (e) {
+  $('#result-list').on('click', '.name', function (e) {
     e.preventDefault();
-    var thisCardIndex = $(this).siblings('.label').text(); //get the label number of the card clicked on.
+    var thisCardIndex = ($(this).siblings('.label').text() - 1);
+    getPlaceDetails(state.results[thisCardIndex].place_id);
     resetDetails();
-    handleGetPhotos(state.detailedResults[thisCardIndex - 1]);
-    renderDetails(state.detailedResults[thisCardIndex - 1]);
     scrollToSection('#details');
   });
 }
 
+function getAllImages(thisObjDetails) {
+  // assign all images to the selected roaster
+  if (thisObjDetails.photos) {
+    thisObjDetails.imgUrls = thisObjDetails.photos.map(element => getPhotoUrl(element, 1));
+  } else {
+    thisObjDetails.imgUrls = null;
+  }
+}
+
 function renderDetails(thisObjDetails) {
   // appends object details bound to html templates to DOM and adds header background image
+  getAllImages(thisObjDetails);
+
   var header = renderHeader(thisObjDetails);
   var contact = renderContact(thisObjDetails);
   var feedback = renderFeedback(thisObjDetails);
@@ -358,7 +356,7 @@ function renderDetails(thisObjDetails) {
 function renderHeader(thisObjDetails) {
   // bind object details to header
 
-  var googleMapsBaseUrl = 'http://maps.google.com/maps?daddr=';
+  const GOOGLEMAPSBASEURL = 'http://maps.google.com/maps?daddr=';
 
   var headerHtml = (
     '<header class="roaster-banner">' +
@@ -372,7 +370,7 @@ function renderHeader(thisObjDetails) {
   var $header = $(headerHtml);
 
   $header.find('h1').text(thisObjDetails.name);
-  $header.find('h3').html('<a href="' + googleMapsBaseUrl + thisObjDetails.lat + ',' + thisObjDetails.lng + '" target="_blank"><i class="fa fa-map-marker" aria-hidden="true"></i> ' + thisObjDetails.addr + '</a>');
+  $header.find('h3').html('<a href="' + GOOGLEMAPSBASEURL + thisObjDetails.lat + ',' + thisObjDetails.lng + '" target="_blank"><i class="fa fa-map-marker" aria-hidden="true"></i> ' + thisObjDetails.addr + '</a>');
 
   return $header
 }
