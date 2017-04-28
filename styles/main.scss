@@ -17,18 +17,15 @@ $color5: #783a3a;
   background-color: $color1;
   align-items: center;
   flex-direction: column;
-  #location-form {
-    width: 50%;
     input {
       border: none;
       padding: 12px;
       border-radius: 3px;
       margin-bottom: 15px;
-      width: 100%;
+      width: 50%;
       text-align: center;
       background-color: $color2;
     }
-  }
   #logo {
     height: 25%;
     margin-bottom: 20px;
