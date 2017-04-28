@@ -154,16 +154,16 @@ function reverseGeocode(pos) {
     'latLng': latlng
   }, function (results, status) {
     if (status === google.maps.GeocoderStatus.OK) {
-      console.log(results);
       renderArea(results[1].address_components[0].short_name);
     } else {
-      //alert the user that their locaiton cannot be determined.
-      console.error('Can\'t reverse geocode this locaiton');
+      // alert the user that their location cannot be determined.
+      console.error('Can\'t reverse geocode this location');
     }
   });
 }
 
 function handleLocationError(browserHasGeolocation, infowindow, pos) {
+  window.alert('Error: Geolocation service failed. Try entering your city.');
   infowindow.setPosition(pos);
   infowindow.setContent(browserHasGeolocation ?
     'Error: The Geolocation service failed. Try entering in your city.' :
@@ -172,7 +172,6 @@ function handleLocationError(browserHasGeolocation, infowindow, pos) {
 
 function callback(results, status) {
   if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
-    console.log(results);
     results.map(element => state.results.push(element));
     createMarker();
   } else {
@@ -222,23 +221,36 @@ function getPlaceDetails(place_id) {
 function detailsCallback(results, status) {
   // aggregate relevant details from .getDetails and store in global state.
   if (status === google.maps.places.PlacesServiceStatus.OK) {
+    // de-structure the results object response
+    let {
+      name = null,
+      formatted_address = null,
+      opening_hours = null,
+      international_phone_number = null,
+      website = null,
+      rating = null,
+      photos = null,
+      reviews = null,
+      geometry = null
+    } = results;
+
     state.detailedResults = {
-      name: results.name || null,
-      addr: results.formatted_address ? results.formatted_address : null,
-      open: results.opening_hours ? results.opening_hours.open_now : null,
-      phone: results.international_phone_number ? results.international_phone_number : null,
-      website: results.website || null,
-      rating: results.rating ? results.rating : null,
-      photos: results.photos ? results.photos : null,
+      name: name,
+      addr: formatted_address,
+      open: opening_hours.open_now,
+      phone: international_phone_number,
+      website: website,
+      rating: rating,
+      photos: photos,
       photoDimension: {
-        'maxWidth': (results.photos && results.photos[0].width) ? results.photos[0].width : null,
-        'maxHeight': (results.photos && results.photos[0].height) ? results.photos[0].height : null
+        'maxWidth': (photos && photos[0].width) ? photos[0].width : null,
+        'maxHeight': (photos && photos[0].height) ? photos[0].height : null
       },
-      hours: results.opening_hours ? results.opening_hours.weekday_text : null,
-      reviews: results.reviews ? results.reviews : null,
+      hours: opening_hours.weekday_text,
+      reviews: reviews,
       imgUrls: [],
-      lat: results.geometry.location.lat(),
-      lng: results.geometry.location.lng()
+      lat: geometry.location.lat(),
+      lng: geometry.location.lng()
     };
   } else {
     console.error(status);
@@ -276,7 +288,7 @@ function renderResultCard() {
     $res.find('.name').text(element.name);
     $res.find('.label').text(element.label);
     $res.find('.address').text(element.vicinity);
-    $res.find('.open-closed').text(element.open ? 'Open now' : 'Closed');
+    $res.find('.open-closed').text(element.opening_hours.open_now ? 'Open now' : 'Closed');
     $res.find('.rating').text(element.rating === null ? 'No rating.' : 'Rating: ' + element.rating + '/5');
     $res.find('img').attr('src', element.photos ? getPhotoUrl(element.photos[0], 2) : 'http://bit.ly/2oNpyEE');
 
