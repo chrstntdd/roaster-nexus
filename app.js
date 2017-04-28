@@ -172,7 +172,7 @@ function handleLocationError(browserHasGeolocation, infowindow, pos) {
 
 function callback(results, status) {
   if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
-    results.map(element => state.results.push(element));
+    _.map(results, element => state.results.push(element));
     createMarker();
   } else {
     renderNoResults();
@@ -186,7 +186,7 @@ function renderNoResults() {
 }
 
 function createMarker() {
-  state.results.map(function (element) {
+  _.map( state.results, element => {
     var placeLoc = {
       lat: element.geometry.location.lat(),
       lng: element.geometry.location.lng()
@@ -239,6 +239,7 @@ function detailsCallback(results, status) {
       addr: formatted_address,
       open: opening_hours.open_now,
       phone: international_phone_number,
+      tel: international_phone_number.replace(/[\D]/g, ""),
       website: website,
       rating: rating,
       photos: photos,
@@ -282,13 +283,16 @@ function renderResultCard() {
     '</li>'
   );
 
-  state.results.map(function (element) {
+  _.map( state.results, element => {
     var $res = $(resultCardHtml);
+    console.log(element);
 
     $res.find('.name').text(element.name);
     $res.find('.label').text(element.label);
     $res.find('.address').text(element.vicinity);
-    $res.find('.open-closed').text(element.opening_hours.open_now ? 'Open now' : 'Closed');
+    element.opening_hours ? 
+      $res.find('.open-closed').text(element.opening_hours.open_now ? 'Open now' : 'Closed') :
+      $res.find('.open-closed').text('No hours available.');
     $res.find('.rating').text(element.rating === null ? 'No rating.' : 'Rating: ' + element.rating + '/5');
     $res.find('img').attr('src', element.photos ? getPhotoUrl(element.photos[0], 2) : 'http://bit.ly/2oNpyEE');
 
@@ -340,7 +344,7 @@ function handleCardClick() {
 function getAllImages(thisObjDetails) {
   // assign all images to the selected roaster
   if (thisObjDetails.photos) {
-    thisObjDetails.imgUrls = thisObjDetails.photos.map(element => getPhotoUrl(element, 1));
+    thisObjDetails.imgUrls = _.map(thisObjDetails.photos, element => getPhotoUrl(element, 1));
   } else {
     thisObjDetails.imgUrls = null;
   }
@@ -390,14 +394,16 @@ function renderHeader(thisObjDetails) {
 function renderContact(thisObjDetails) {
   // bind object details to contact section
 
-  var hours = thisObjDetails.hours ? thisObjDetails.hours.map(dayHours => '<li>' + dayHours + '</li>') : null;
+  console.log(thisObjDetails);
+
+  var hours = thisObjDetails.hours ? _.map(thisObjDetails.hours, dayHours => '<li>' + dayHours + '</li>') : null;
 
   var contactHtml = (
     '<section id="contact">' +
     '<h3>HOURS</h3>' +
     '<ol id="hours"></ol>' +
     '<h3>PHONE</h3>' +
-    '<p id="phone"></p>' +
+    '<a href="" id="phone"></a>' +
     '<h3>WEBSITE</h3>' +
     '<a id="website" target="_blank"></a>' +
     '</section>'
@@ -407,6 +413,7 @@ function renderContact(thisObjDetails) {
 
   $contact.find('#hours').html(hours ? hours : 'No hours available.');
   $contact.find('#phone').text(thisObjDetails.phone != null ? thisObjDetails.phone : 'No phone number available.');
+  $contact.find('#phone').attr('href', 'tel:' + thisObjDetails.tel);
   $contact.find('#website').attr('href', thisObjDetails.website).text(thisObjDetails.website);
 
   return $contact;
@@ -439,7 +446,7 @@ function renderReviews(thisObjDetails) {
   if (thisObjDetails.reviews === null) {
     return '<p>No reviews available.</p>';
   } else {
-    thisObjDetails.reviews.map(function (review) {
+    _.map(thisObjDetails.reviews, review => {
       var reviewHtml = (
         '<li>' +
         '<article class="review">' +
