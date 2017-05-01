@@ -13,6 +13,7 @@ function resetInput() {
   $('#autocomplete').on('focus', function (e) {
     e.preventDefault();
     $(this).val('');
+    showElement(false, 'footer');
   });
 }
 
@@ -37,16 +38,16 @@ function googleAutoComplete() {
     };
     initMap(pos);
     resetDetails();
-    showLoader(true);
+    showElement(true, '.loading');
     scrollToResults();
     renderArea(place.formatted_address);
   });
 }
 
-function showLoader(boolean) {
+function showElement(boolean, element) {
   boolean ?
-    $('.loading').removeClass('hidden') :
-    $('.loading').addClass('hidden');
+    $(element).removeClass('hidden') :
+    $(element).addClass('hidden');
 }
 
 function resetDetails() {
@@ -56,7 +57,8 @@ function resetDetails() {
 function handleUseCurrentLocation() {
   // get user location from geolocation button
   $('#current-loc-btn').on('click  ', function (e) {
-    showLoader(true);
+    showElement(true, '.loading');
+    showElement(false, 'footer');
     resetDetails();
     getGeoLatLng();
     scrollToResults();
@@ -181,7 +183,7 @@ function callback(results, status) {
 
 function renderNoResults() {
   //ALERT THE USER THAT NO RESULTS WERE FOUND
-  showLoader(false);
+  showElement(false, '.loading');
   renderFallbackCard();
 }
 
@@ -237,9 +239,9 @@ function detailsCallback(results, status) {
     state.detailedResults = {
       name: name,
       addr: formatted_address,
-      open: opening_hours.open_now,
+      open: opening_hours ? opening_hours.open_now : null,
       phone: international_phone_number,
-      tel: international_phone_number.replace(/[\D]/g, ""),
+      tel: international_phone_number ? international_phone_number.replace(/[\D]/g, "") : null,
       website: website,
       rating: rating,
       photos: photos,
@@ -247,7 +249,7 @@ function detailsCallback(results, status) {
         'maxWidth': (photos && photos[0].width) ? photos[0].width : null,
         'maxHeight': (photos && photos[0].height) ? photos[0].height : null
       },
-      hours: opening_hours.weekday_text,
+      hours: opening_hours ? opening_hours.weekday_text : null,
       reviews: reviews,
       imgUrls: [],
       lat: geometry.location.lat(),
@@ -266,7 +268,7 @@ function renderArea(area) {
 
 function renderResultCard() {
   //render place details into the DOM
-  showLoader(false);
+  showElement(false, '.loading');
 
   var resultCardHtml = (
     '<li>' +
@@ -285,7 +287,6 @@ function renderResultCard() {
 
   _.map( state.results, element => {
     var $res = $(resultCardHtml);
-    console.log(element);
 
     $res.find('.name').text(element.name);
     $res.find('.label').text(element.label);
@@ -326,7 +327,7 @@ function renderFallbackCard() {
   $('#btn-fallback').on('click  ', function (e) {
     e.preventDefault();
     scrollToSection('#main-header');
-    $('footer').addClass('hidden');
+    showElement(false, 'footer');
   });
 }
 
@@ -365,7 +366,7 @@ function renderDetails(thisObjDetails) {
     'background-image': 'linear-gradient(to bottom,rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.6)), url("' + thisObjDetails.imgUrls[0] + '")'
   });
 
-  $('footer').removeClass('hidden');
+  showElement(true, 'footer');
 
 }
 
@@ -394,16 +395,16 @@ function renderHeader(thisObjDetails) {
 function renderContact(thisObjDetails) {
   // bind object details to contact section
 
-  console.log(thisObjDetails);
-
-  var hours = thisObjDetails.hours ? _.map(thisObjDetails.hours, dayHours => '<li>' + dayHours + '</li>') : null;
+  var hours = thisObjDetails.hours ? 
+    _.map(thisObjDetails.hours, dayHours => '<li>' + dayHours + '</li>') :
+    null;
 
   var contactHtml = (
     '<section id="contact">' +
     '<h3>HOURS</h3>' +
     '<ol id="hours"></ol>' +
     '<h3>PHONE</h3>' +
-    '<a href="" id="phone"></a>' +
+    '<p id="phone"></>' +
     '<h3>WEBSITE</h3>' +
     '<a id="website" target="_blank"></a>' +
     '</section>'
@@ -412,9 +413,11 @@ function renderContact(thisObjDetails) {
   var $contact = $(contactHtml);
 
   $contact.find('#hours').html(hours ? hours : 'No hours available.');
-  $contact.find('#phone').text(thisObjDetails.phone != null ? thisObjDetails.phone : 'No phone number available.');
-  $contact.find('#phone').attr('href', 'tel:' + thisObjDetails.tel);
   $contact.find('#website').attr('href', thisObjDetails.website).text(thisObjDetails.website);
+  // if tel exists, set the phone number as an anchor, else set it as a regular p tag.
+  thisObjDetails.tel != null ?
+    $contact.find('#phone').html(`<a href="tel:${thisObjDetails.tel}">${thisObjDetails.phone}</a>`) :
+    $contact.find('#phone').text(thisObjDetails.phone != null ? thisObjDetails.phone : 'No phone number available.');
 
   return $contact;
 }
