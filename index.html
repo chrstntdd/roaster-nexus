@@ -15,16 +15,20 @@
 <body>
   <header id='main-header'>
     <img id='logo' src="./assets/rn.png" alt="Roaster Nexus Logo">
-    <input id='autocomplete' type="text" name="location" placeholder="Enter city">
-    <button id='current-loc-btn'><i class="fa fa-location-arrow" aria-hidden="true"></i> FIND LOCATION</button>
+    <div id="search-wrapper">
+      <input id='autocomplete' type="text" name="location" placeholder="Enter city">
+      <button id='current-loc-btn'><i class="fa fa-location-arrow" aria-hidden="true"></i></button>
+    </div>
   </header>
   <main>
     <div class="wrapper hidden">
+      <button id='over-map' class='hidden'><i class="fa fa-list" aria-hidden="true"></i> SHOW LIST</button>
       <section id="map">
         <div class="loading"></div>
       </section>
       <aside id="result-list">
         <h2 id="location"></h2>
+        <button id='map-list'><i class="fa fa-map" aria-hidden="true"></i> SHOW MAP</button>
         <div class="loading"></div>
         <ol id="result-cards"></ol>
       </aside>
