@@ -5,8 +5,10 @@ $(function () {
   handleCardClick();
   googleAutoComplete();
   handleReturnToResults();
-  testScreenSize();
   resetInput();
+  testScreenSize();
+  toggleMap();
+  toggleList();
 });
 
 function resetInput() {
@@ -66,7 +68,7 @@ function handleUseCurrentLocation() {
 }
 
 function scrollToSection(pageLocation) {
-  $('body, html').animate({
+  $('body, html').stop().animate({
     scrollTop: $(pageLocation).offset().top
   }, 2000);
 }
@@ -174,6 +176,11 @@ function handleLocationError(browserHasGeolocation, infowindow, pos) {
 
 function callback(results, status) {
   if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+    var firstResLocation = {
+      lat: results[0].geometry.location.lat(),
+      lng: results[0].geometry.location.lng()
+    }
+    myMap.setCenter(firstResLocation);
     _.map(results, element => state.results.push(element));
     createMarker();
   } else {
@@ -264,6 +271,7 @@ function detailsCallback(results, status) {
 
 function renderArea(area) {
   $('#location').text('Coffee roasters near ' + area);
+  $('#btn-show-map').css({'visibility': 'visible'});
 }
 
 function renderResultCard() {
@@ -316,7 +324,7 @@ function renderFallbackCard() {
     '<li>' +
     '<article class="result fallback">' +
     '<h3>Can\'t find what you\'re looking for?</h3>' +
-    '<button id="btn-fallback">TRY ANOTHER SEARCH</button>' +
+    '<button id="btn-fallback">TRY ANOTHER SEARCH <i class="fa fa-search" aria-hidden="true"></i></button>' +
     '</article>' +
     '</li>'
   );
@@ -486,5 +494,30 @@ function testScreenSize() {
     $('#map').hide();
   }
 }
+
+function toggleMap () {
+  $('#btn-show-map').on('click', function(e) {
+    resetDetails();
+    $('#map').show();
+    $('#result-list').hide();
+    showElement(false, 'footer');
+    showElement(true, '#btn-show-list')
+    let center = {
+      lat: state.results[0].geometry.location.lat(),
+      lng: state.results[0].geometry.location.lng()
+    }
+    google.maps.event.trigger(myMap, 'resize');
+    myMap.setCenter(center);
+  });
+}
+
+function toggleList () {
+  $('#btn-show-list').on('click', function(e) {
+    showElement(false, '#btn-show-list')
+    $('#map').hide();
+    $('#result-list').show();
+  });
+}
+
 
 // TODO: hide map for mobile users behind a button press.
