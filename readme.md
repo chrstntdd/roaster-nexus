@@ -1,9 +1,9 @@
 # Roaster Nexus
 
 ## Table of Contents
-+ [Summary]()
-+ [Technology]()
-+ [Screenshots]()
++ [Summary](https://github.com/chrstntdd/roaster-nexus/#summary/)
++ [Technology](https://github.com/chrstntdd/roaster-nexus/#technology)
++ [Screenshots](https://github.com/chrstntdd/roaster-nexus/#screenshots)
 
 
 ### Summary
