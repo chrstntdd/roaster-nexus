@@ -1,48 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <meta http-equiv='X-UA-Compatible' content='ie=edge'>
   <title>Roaster Nexus</title>
   <link rel='shortcut icon' href='assets/rn-favicon.png'>
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css'>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="./styles/main.css">
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'>
+  <link rel='stylesheet' href='./styles/main.css'>
 </head>
 
 <body>
   <header id='main-header'>
-    <img id='logo' src="./assets/rn.png" alt="Roaster Nexus Logo">
-    <div id="search-wrapper">
-      <input id='autocomplete' type="text" name="location" placeholder="Enter city">
-      <button id='current-loc-btn'><i class="fa fa-location-arrow" aria-hidden="true"></i></button>
+    <img id='logo' src='./assets/rn.png' alt='Roaster Nexus Logo'>
+    <div id='search-wrapper'>
+      <input id='autocomplete' type='text' name='location' placeholder='Enter city'>
+      <button id='current-loc-btn'><i class='fa fa-location-arrow' aria-hidden='true'></i></button>
+    </div>
+    <div id='about'>
+      <h3>About</h3>
+      <p>Roaster Nexus is a simple web app that connects coffee lovers to local and distant coffee roasters. Enter in any city
+        (in the US) or use your current location in the search above to get started! </p>
     </div>
   </header>
   <main>
-    <div class="wrapper hidden">
-      <button id='btn-show-list' class='hidden'><i class="fa fa-list" aria-hidden="true"></i> SHOW LIST</button>
-      <section id="map">
-        <div class="loading"></div>
+    <div class='wrapper hidden'>
+      <button id='btn-show-list' class='hidden'><i class='fa fa-list' aria-hidden='true'></i> SHOW LIST</button>
+      <section id='map'>
+        <div class='loading'></div>
       </section>
-      <aside id="result-list">
-        <h2 id="location"></h2>
-        <button id='btn-show-map'><i class="fa fa-map" aria-hidden="true"></i> SHOW MAP</button>
-        <div class="loading"></div>
-        <ol id="result-cards"></ol>
+      <aside id='result-list'>
+        <h2 id='location'></h2>
+        <button id='btn-show-map'><i class='fa fa-map' aria-hidden='true'></i> SHOW MAP</button>
+        <div class='loading'></div>
+        <ol id='result-cards'></ol>
       </aside>
     </div>
-    <article id="details"></article>
+    <article id='details'></article>
     <footer class='hidden'>
-      <button id='return-to-results'><i class="fa fa-arrow-up" aria-hidden="true"></i> RETURN TO RESULTS <i class="fa fa-arrow-up" aria-hidden="true"></i></button>
+      <button id='return-to-results'><i class='fa fa-arrow-up' aria-hidden='true'></i> RETURN TO RESULTS <i class='fa fa-arrow-up' aria-hidden='true'></i></button>
     </footer>
   </main>
-  <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-    crossorigin="anonymous"></script>
+  <script src='https://code.jquery.com/jquery-3.2.1.min.js' integrity='sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4='
+    crossorigin='anonymous'></script>
   <script src='https://cdn.jsdelivr.net/lodash/4.17.4/lodash.js'></script>
-  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJFH1G1JHfT5PTGSeC3ywLQetvikyJZDc&libraries=places"></script>
-  <script type="text/javascript" src='./app.js'></script>
+  <script type='text/javascript' src='https://maps.googleapis.com/maps/api/js?key=AIzaSyAJFH1G1JHfT5PTGSeC3ywLQetvikyJZDc&libraries=places'></script>
+  <script type='text/javascript' src='./app.js'></script>
 </body>
 
 </html>
