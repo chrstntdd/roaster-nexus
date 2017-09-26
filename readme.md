@@ -7,7 +7,7 @@
 
 
 ### Summary
-Web app to connect coffee lovers to local coffee roasters.
+My very first web app. Roaster Nexus utilizes the HTML5 geolocation API and the Google Maps API to connect users with local coffee roasters. Users can also explore and discover other coffee roasters across the United States.
 
 ### Technology
 
@@ -18,10 +18,7 @@ Web app to connect coffee lovers to local coffee roasters.
 
 ### Screenshots
 
-<div style='display: flex, justify-content: center, flex-wrap: wrap'>
-  <img src='./assets/ss1.png' style='height: 350px'></img>
-  <img src='./assets/ss2.png' style='height: 350px'></img>
-  <img src='./assets/ss3.png' style='height: 350px'></img>
-  <img src='./assets/ss4.png' style='height: 350px'></img>
-  <img src='./assets/ss5.png' style='height: 350px'></img>
-</div>
+
+![alt text](./assets/ss1.png "Above the fold")
+![alt text](./assets/ss2.png "Search results")
+![alt text](./assets/ss3.png "Roaster details")
