@@ -24,8 +24,8 @@ function googleAutoComplete() {
   var options = {
     types: ['(cities)'],
     componentRestrictions: {
-      country: 'us',
-    },
+      country: 'us'
+    }
   };
 
   var input = document.getElementById('autocomplete');
@@ -36,7 +36,7 @@ function googleAutoComplete() {
     var place = myAutocomplete.getPlace();
     pos = {
       lat: place.geometry.location.lat(),
-      lng: place.geometry.location.lng(),
+      lng: place.geometry.location.lng()
     };
     initMap(pos);
     resetDetails();
@@ -66,12 +66,14 @@ function handleUseCurrentLocation() {
 }
 
 function scrollToSection(pageLocation) {
-  $('body, html').stop().animate(
-    {
-      scrollTop: $(pageLocation).offset().top,
-    },
-    2000
-  );
+  $('body, html')
+    .stop()
+    .animate(
+      {
+        scrollTop: $(pageLocation).offset().top
+      },
+      2000
+    );
 }
 
 function scrollToResults() {
@@ -81,13 +83,13 @@ function scrollToResults() {
   $('#location, #result-cards').html('');
   state = {
     results: [],
-    detailedResults: [],
+    detailedResults: []
   };
   labelCount = 1;
 }
 
 var state = {
-  results: [],
+  results: []
 };
 
 var myMap;
@@ -102,7 +104,7 @@ function getGeoLatLng() {
       function(position) {
         pos = {
           lat: position.coords.latitude,
-          lng: position.coords.longitude,
+          lng: position.coords.longitude
         };
 
         reverseGeocode(pos);
@@ -127,15 +129,15 @@ function initMap(pos) {
   myMap = new google.maps.Map(document.getElementById('map'), {
     center: {
       lat: pos.lat,
-      lng: pos.lng,
+      lng: pos.lng
     },
     zoom: 13,
     streetViewControl: false,
-    scrollwheel: false,
+    scrollwheel: false
   });
 
   infowindow = new google.maps.InfoWindow({
-    map: myMap,
+    map: myMap
   });
   getNearbySearch(pos);
 }
@@ -145,7 +147,7 @@ function getNearbySearch(pos) {
   var request = {
     location: pos,
     keyword: 'roaster',
-    rankBy: google.maps.places.RankBy.DISTANCE,
+    rankBy: google.maps.places.RankBy.DISTANCE
   };
 
   var service = new google.maps.places.PlacesService(myMap);
@@ -159,7 +161,7 @@ function reverseGeocode(pos) {
 
   geocoder.geocode(
     {
-      latLng: latlng,
+      latLng: latlng
     },
     function(results, status) {
       if (status === google.maps.GeocoderStatus.OK) {
@@ -189,7 +191,7 @@ function callback(results, status) {
   ) {
     var firstResLocation = {
       lat: results[0].geometry.location.lat(),
-      lng: results[0].geometry.location.lng(),
+      lng: results[0].geometry.location.lng()
     };
     myMap.setCenter(firstResLocation);
     _.map(results, element => state.results.push(element));
@@ -209,12 +211,12 @@ function createMarker() {
   _.map(state.results, element => {
     var placeLoc = {
       lat: element.geometry.location.lat(),
-      lng: element.geometry.location.lng(),
+      lng: element.geometry.location.lng()
     };
     var marker = new google.maps.Marker({
       position: placeLoc,
       label: labelCount.toString(),
-      map: myMap,
+      map: myMap
     });
     element.label = marker.label;
     labelCount++;
@@ -232,7 +234,7 @@ function createMarker() {
 function getPlaceDetails(place_id) {
   // make the request to get more details about a selected roaster
   var request = {
-    placeId: place_id,
+    placeId: place_id
   };
   var service = new google.maps.places.PlacesService(myMap);
   service.getDetails(request, detailsCallback);
@@ -251,7 +253,7 @@ function detailsCallback(results, status) {
       rating = null,
       photos = null,
       reviews = null,
-      geometry = null,
+      geometry = null
     } = results;
 
     state.detailedResults = {
@@ -267,13 +269,13 @@ function detailsCallback(results, status) {
       photos: photos,
       photoDimension: {
         maxWidth: photos && photos[0].width ? photos[0].width : null,
-        maxHeight: photos && photos[0].height ? photos[0].height : null,
+        maxHeight: photos && photos[0].height ? photos[0].height : null
       },
       hours: opening_hours ? opening_hours.weekday_text : null,
       reviews: reviews,
       imgUrls: [],
       lat: geometry.location.lat(),
-      lng: geometry.location.lng(),
+      lng: geometry.location.lng()
     };
   } else {
     console.error(status);
@@ -341,7 +343,7 @@ function getPhotoUrl(placePhotoObject, resolution) {
   // return image url
   var photoDimension = {
     maxWidth: parseInt(placePhotoObject.width / resolution),
-    maxHeight: parseInt(placePhotoObject.height / resolution),
+    maxHeight: parseInt(placePhotoObject.height / resolution)
   };
   return placePhotoObject.getUrl(photoDimension);
 }
@@ -369,7 +371,10 @@ function handleCardClick() {
   // get result index to reference its details in renderDetails
   $('#result-list').on('click', '.name', function(e) {
     e.preventDefault();
-    var thisCardIndex = $(this).siblings('.label').text() - 1;
+    var thisCardIndex =
+      $(this)
+        .siblings('.label')
+        .text() - 1;
     getPlaceDetails(state.results[thisCardIndex].place_id);
     resetDetails();
     scrollToSection('#details');
@@ -402,7 +407,7 @@ function renderDetails(thisObjDetails) {
     'background-image':
       'linear-gradient(to bottom,rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.6)), url("' +
       thisObjDetails.imgUrls[0] +
-      '")',
+      '")'
   });
 
   showElement(true, 'footer');
@@ -560,7 +565,7 @@ function toggleMap() {
     showElement(true, '#btn-show-list');
     let center = {
       lat: state.results[0].geometry.location.lat(),
-      lng: state.results[0].geometry.location.lng(),
+      lng: state.results[0].geometry.location.lng()
     };
     google.maps.event.trigger(myMap, 'resize');
     myMap.setCenter(center);
